@@ -75,7 +75,6 @@ dots-beacon/
 
 Requirements for developments:
 
-- [air](https://github.com/air-verse/air)
 - [task](https://taskfile.dev/)
 - [go >1.26.3](https://go.dev/doc/install)
 - [sqlc](https://docs.sqlc.dev/en/latest/index.html)
@@ -84,3 +83,10 @@ Requirements for developments:
 # Develop
 
 Use [task](https://taskfile.dev/) to run the project locally
+
+# Schema change
+
+- Add a new migration file with this format `{ddMMyyyyHHMM_description.up.sql}` and `*.down.sql`
+- Run `sqlc generate` from the root folder
+- Run `task migrate-up` to update the local db
+  - If it fails, check what failed, fix / drop the migration and re-run it.

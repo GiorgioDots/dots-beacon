@@ -27,15 +27,11 @@ tasks:
     cmds:
       - migrate -path internal/database/migrations -database {{.DATABASE_URL}} down
 
-  sqlc-generate:
-    cmds:
-      - sqlc generate
-
   dev-compose:
     desc: Run docker compose locally
     internal: true
     cmds:
-      - docker compose up -d
+      - docker compose up -d --wait
 
   dev-api:
     desc: Run api dev server

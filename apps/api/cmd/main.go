@@ -13,6 +13,7 @@ func main() {
 	cfg, err := env.ParseAs[config.AppConfig]()
 	if err != nil {
 		fmt.Printf("An error occured while parsing environment variables %v\n", err)
+		return
 	}
 
 	fmt.Printf("%s\n", cfg.DatabaseUrl)
