@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+interval: 500ms
+dotenv:
+  - .env.local
+  - .env.{{.ENV}}
+  - .env
+
+tasks:
+  default:
+    desc: Tasks guide
+    cmds:
+      - "echo \"Available commands: \n  - task dev-api: start api dev server;\""
+    silent: true
+
+  migrate-up:
+    deps:
+      - dev-compose
+    cmds:
+      - migrate -path internal/database/migrations -database {{.DATABASE_URL}} up
+
+  migrate-down:
+    deps:
+      - dev-compose
+    cmds:
+      - migrate -path internal/database/migrations -database {{.DATABASE_URL}} down
+
+  sqlc-generate:
+    cmds:
+      - sqlc generate
+
+  dev-compose:
+    desc: Run docker compose locally
+    internal: true
+    cmds:
+      - docker compose up -d
+
+  dev-api:
+    desc: Run api dev server
+    watch: true
+    dir: "apps/api"
+    deps:
+      - dev-compose
+    sources:
+      - "**/*.go"
+    cmds:
+      - "go build -o ./tmp/main ./cmd/"
+      - "./tmp/main"
