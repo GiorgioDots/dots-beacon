@@ -1,4 +1,5 @@
-# Single-binary Loki for local dev (filesystem storage).
+# Single-binary Loki. Chunks + index persist to MinIO (S3); /loki holds only
+# ephemeral working state. Requires -config.expand-env=true for env substitution.
 auth_enabled: false
 
 server:
@@ -8,9 +9,13 @@ common:
   instance_addr: 127.0.0.1
   path_prefix: /loki
   storage:
-    filesystem:
-      chunks_directory: /loki/chunks
-      rules_directory: /loki/rules
+    s3:
+      endpoint: minio:9000
+      bucketnames: ${LOKI_S3_BUCKET}
+      access_key_id: ${MINIO_ROOT_USER}
+      secret_access_key: ${MINIO_ROOT_PASSWORD}
+      s3forcepathstyle: true   # required for MinIO
+      insecure: true           # http on the compose network
   replication_factor: 1
   ring:
     kvstore:
@@ -20,7 +25,7 @@ schema_config:
   configs:
     - from: 2020-10-24
       store: tsdb
-      object_store: filesystem
+      object_store: s3
       schema: v13
       index:
         prefix: index_

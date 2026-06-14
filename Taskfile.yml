@@ -31,7 +31,8 @@ tasks:
     desc: Run docker compose locally
     internal: true
     cmds:
-      - docker compose up -d --wait
+      # --env-file so compose interpolates ${...} (MinIO/Postgres creds) from .env.local
+      - docker compose --env-file .env.local up -d --wait
 
   dev-api:
     desc: Run api dev server
