@@ -11,6 +11,7 @@ import (
 	"github.com/caarlos0/env/v11"
 	"github.com/gin-gonic/gin"
 	"github.com/giorgio-dots/dots-beacon-api/config"
+	"github.com/giorgio-dots/dots-beacon-internal/auth"
 	"github.com/giorgio-dots/dots-beacon-internal/database"
 	"github.com/giorgio-dots/dots-beacon-internal/database/db"
 	"github.com/giorgio-dots/dots-beacon-internal/telemetry"
@@ -65,6 +66,30 @@ func main() {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"sites": sites})
+	})
+
+	// Routes requiring a valid Keycloak token. Auth is enabled only when
+	// KEYCLOAK_ISSUER_URL is set, so the API still runs without Keycloak in dev.
+	authCfg := auth.Config{IssuerURL: cfg.KeycloakIssuerURL, ClientID: cfg.KeycloakClientID}
+	protected := r.Group("/")
+	if authCfg.Enabled() {
+		authenticator, err := auth.New(ctx, authCfg)
+		if err != nil {
+			telemetry.Log().Fatal().Err(err).Msg("failed to initialise Keycloak authenticator")
+		}
+		protected.Use(authenticator.Middleware())
+		telemetry.Log().Info().Str("issuer", authCfg.IssuerURL).Msg("Keycloak authentication enabled")
+	} else {
+		telemetry.Log().Warn().Msg("KEYCLOAK_ISSUER_URL not set — authentication disabled")
+	}
+
+	protected.GET("/me", func(c *gin.Context) {
+		user, ok := auth.UserFromContext(c)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "not authenticated"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"user": user})
 	})
 
 	srv := &http.Server{

@@ -99,3 +99,11 @@ Grafana (http://localhost:3000).
 
 See [docs/telemetry](docs/telemetry/README.md) — including how to
 [instrument a new service](docs/telemetry/instrumenting-a-service.md).
+
+# Authentication
+
+Keycloak is the identity provider (login + users); the APIs verify its tokens via
+the shared [`internal/auth`](internal/auth/) package. The dev stack pre-seeds a
+realm, client, and test user.
+
+See [docs/auth](docs/auth/README.md).

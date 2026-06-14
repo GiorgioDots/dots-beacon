@@ -1,0 +1,58 @@
+{
+  "realm": "dots-beacon",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "accessTokenLifespan": 300,
+  "roles": {
+    "realm": [
+      { "name": "user", "description": "Standard authenticated user" },
+      { "name": "admin", "description": "Administrator" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "dots-beacon-app",
+      "name": "dots-beacon application client",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true
+    }
+  ],
+  "users": [
+    {
+      "username": "dev",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "dev@dots-beacon.local",
+      "firstName": "Dev",
+      "lastName": "User",
+      "credentials": [
+        { "type": "password", "value": "dev", "temporary": false }
+      ],
+      "realmRoles": ["user"]
+    },
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "admin@dots-beacon.local",
+      "firstName": "Realm",
+      "lastName": "Admin",
+      "credentials": [
+        { "type": "password", "value": "admin", "temporary": false }
+      ],
+      "realmRoles": ["admin", "user"],
+      "clientRoles": {
+        "realm-management": ["realm-admin"]
+      }
+    }
+  ]
+}
