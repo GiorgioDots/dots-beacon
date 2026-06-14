@@ -1,0 +1,60 @@
+# Monolithic Grafana Mimir for local dev. TSDB blocks persist to MinIO (S3).
+# Prometheus-compatible: the collector remote-writes metrics here, Grafana
+# queries them. Requires -config.expand-env=true for the env substitutions.
+multitenancy_enabled: false
+
+server:
+  http_listen_port: 9009
+  log_level: warn
+
+# Shared S3 (MinIO) backend + credentials; each store just names its bucket.
+common:
+  storage:
+    backend: s3
+    s3:
+      endpoint: minio:9000
+      access_key_id: ${MINIO_ROOT_USER}
+      secret_access_key: ${MINIO_ROOT_PASSWORD}
+      insecure: true   # http on the compose network
+
+blocks_storage:
+  s3:
+    bucket_name: mimir-blocks
+  tsdb:
+    dir: /data/tsdb
+  bucket_store:
+    sync_dir: /data/tsdb-sync
+
+ruler_storage:
+  s3:
+    bucket_name: mimir-ruler
+
+compactor:
+  data_dir: /data/compactor
+  sharding_ring:
+    kvstore:
+      store: memberlist
+
+distributor:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: memberlist
+
+ingester:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: memberlist
+    replication_factor: 1
+
+store_gateway:
+  sharding_ring:
+    replication_factor: 1
+
+limits:
+  # Dev-friendly: generous ingest rate, tolerate slightly out-of-order samples
+  # (remote-write batches can arrive a bit unordered).
+  ingestion_rate: 100000
+  ingestion_burst_size: 200000
+  out_of_order_time_window: 5m
