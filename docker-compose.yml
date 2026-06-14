@@ -1,7 +1,7 @@
 services:
   dots-beacon-dev-db:
     image: "postgres:18"
-    ports: 
+    ports:
       - 5433:5432
     env_file:
       .env.local
@@ -19,7 +19,29 @@ services:
     volumes:
       - ./observability/otel-collector/otel-collector.yml:/etc/otel-collector.yml
     ports:
-      - 4317:4317
+      - 4317:4317   # OTLP gRPC (services export here)
+      - 4318:4318   # OTLP HTTP
+    depends_on:
+      - tempo
+      - loki
+
+  tempo:
+    image: grafana/tempo:2.9.0
+    command: ["-config.file=/etc/tempo.yml"]
+    volumes:
+      - ./observability/tempo/tempo.yml:/etc/tempo.yml
+      - tempo-data:/var/tempo
+    ports:
+      - 3200:3200   # Tempo API/UI query
+
+  loki:
+    image: grafana/loki:3.5.0
+    command: ["-config.file=/etc/loki/loki.yml"]
+    volumes:
+      - ./observability/loki/loki.yml:/etc/loki/loki.yml
+      - loki-data:/loki
+    ports:
+      - 3100:3100
 
   prometheus:
     image: prom/prometheus:v3.12.0@sha256:69f5241418838263316593f7274a304b095c40bcf22e57272865da91bd60a8ac
@@ -28,8 +50,23 @@ services:
     ports:
       - 9090:9090
 
-  jaeger:
-    image: jaegertracing/all-in-one:1.60@sha256:4fd2d70fa347d6a47e79fcb06b1c177e6079f92cba88b083153d56263082135e
+  grafana:
+    image: grafana/grafana:12.2.0
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
     ports:
-      - 16686:16686
+      - 3000:3000
+    depends_on:
+      - prometheus
+      - tempo
+      - loki
 
+volumes:
+  tempo-data:
+  loki-data:
+  grafana-data:

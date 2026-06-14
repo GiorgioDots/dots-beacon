@@ -2,175 +2,71 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
-	"os"
+	"errors"
+	"net/http"
 	"os/signal"
+	"syscall"
 	"time"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/propagation"
-	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
-	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.41.0"
-	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"github.com/caarlos0/env/v11"
+	"github.com/gin-gonic/gin"
+	"github.com/giorgio-dots/dots-beacon-api/config"
+	"github.com/giorgio-dots/dots-beacon-internal/telemetry"
 )
 
-var serviceName = semconv.ServiceNameKey.String("dots-beacon-api")
-
-// Initialize a gRPC connection to be used by both the tracer and meter
-// providers.
-func initConn() (*grpc.ClientConn, error) {
-	// It connects the OpenTelemetry Collector through local gRPC connection.
-	// You may replace `localhost:4317` with your endpoint.
-	conn, err := grpc.NewClient(
-		"localhost:4317",
-		// Note the use of insecure transport here. TLS is recommended in production.
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
-	}
-
-	return conn, err
-}
-
-// Initializes an OTLP exporter, and configures the corresponding trace provider.
-func initTracerProvider(ctx context.Context, res *resource.Resource, conn *grpc.ClientConn) (func(context.Context) error, error) {
-	// Set up a trace exporter
-	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
-	}
-
-	// Register the trace exporter with a TracerProvider, using a batch
-	// span processor to aggregate spans before export.
-	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
-	tracerProvider := sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.AlwaysSample()),
-		sdktrace.WithResource(res),
-		sdktrace.WithSpanProcessor(bsp),
-	)
-	otel.SetTracerProvider(tracerProvider)
-
-	// Set global propagator to tracecontext (the default is no-op).
-	otel.SetTextMapPropagator(propagation.TraceContext{})
-
-	// Shutdown will flush any remaining spans and shut down the exporter.
-	return tracerProvider.Shutdown, nil
-}
-
-// Initializes an OTLP exporter, and configures the corresponding meter provider.
-func initMeterProvider(ctx context.Context, res *resource.Resource, conn *grpc.ClientConn) (func(context.Context) error, error) {
-	metricExporter, err := otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithGRPCConn(conn))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create metrics exporter: %w", err)
-	}
-
-	meterProvider := sdkmetric.NewMeterProvider(
-		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(metricExporter)),
-		sdkmetric.WithResource(res),
-	)
-	otel.SetMeterProvider(meterProvider)
-
-	return meterProvider.Shutdown, nil
-}
-
 func main() {
-	// cfg, err := env.ParseAs[config.AppConfig]()
-	// if err != nil {
-	// 	fmt.Printf("An error occured while parsing environment variables %v\n", err)
-	// 	return
-	// }
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	// pool, err := pgxpool.New(context.Background(), cfg.DatabaseUrl)
-	// q := db.New(pool)
+	cfg, err := env.ParseAs[config.AppConfig]()
+	if err != nil {
+		telemetry.Log().Fatal().Err(err).Msg("failed to parse environment config")
+	}
 
-	log.Printf("Waiting for connection...")
+	shutdown, err := telemetry.Init(ctx)
+	if err != nil {
+		telemetry.Log().Fatal().Err(err).Msg("failed to initialise telemetry")
+	}
+	defer func() {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := shutdown(shutdownCtx); err != nil {
+			telemetry.Log().Error().Err(err).Msg("telemetry shutdown error")
+		}
+	}()
 
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	if cfg.AppEnv != "dev" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	r := gin.New()
+	r.Use(gin.Recovery())
+	telemetry.InstrumentGin(r)
+
+	r.GET("/healthz", func(c *gin.Context) {
+		telemetry.Log().Info().Ctx(c.Request.Context()).Msg("health check")
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	srv := &http.Server{
+		Addr:    ":" + cfg.HttpPort,
+		Handler: r,
+	}
+
+	go func() {
+		telemetry.Log().Info().Str("addr", srv.Addr).Msg("api listening")
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			telemetry.Log().Fatal().Err(err).Msg("http server failed")
+		}
+	}()
+
+	<-ctx.Done()
+	stop()
+	telemetry.Log().Info().Msg("shutting down")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
-	conn, err := initConn()
-	if err != nil {
-		log.Fatal(err)
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		telemetry.Log().Error().Err(err).Msg("http shutdown error")
 	}
-
-	res, err := resource.New(
-		ctx,
-		resource.WithAttributes(
-			// The service name used to display traces in backends
-			serviceName,
-		),
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	shutdownTracerProvider, err := initTracerProvider(ctx, res, conn)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err := shutdownTracerProvider(ctx); err != nil {
-			log.Fatalf("failed to shutdown TracerProvider: %s", err)
-		}
-	}()
-
-	shutdownMeterProvider, err := initMeterProvider(ctx, res, conn)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err := shutdownMeterProvider(ctx); err != nil {
-			log.Fatalf("failed to shutdown MeterProvider: %s", err)
-		}
-	}()
-
-	name := "github.com/giorgiodots/dots-beacon-api"
-	tracer := otel.Tracer(name)
-	meter := otel.Meter(name)
-
-	commonAttrs := []attribute.KeyValue{
-		attribute.String("attrA", "chocolate"),
-		attribute.String("attrB", "raspberry"),
-		attribute.String("attrC", "vanilla"),
-	}
-
-	runCount, err := meter.Int64Counter("run", metric.WithDescription("The number of times the iteration ran"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Work begins
-	ctx, span := tracer.Start(
-		ctx,
-		"CollectorExporter-Example",
-		trace.WithAttributes(commonAttrs...),
-	)
-	defer span.End()
-	for i := range 10 {
-		_, iSpan := tracer.Start(ctx, fmt.Sprintf("Sample-%d", i))
-		runCount.Add(ctx, 1, metric.WithAttributes(commonAttrs...))
-		log.Printf("Doing really hard work (%d / 10)\n", i+1)
-
-		<-time.After(time.Second)
-		iSpan.End()
-	}
-
-	log.Printf("Done!")
-
-	// plants, err := q.GetPlants(context.Background())
-	// if err != nil {
-	// 	fmt.Printf("An error occured while retrieving the plants %v\n", err)
-	// 	return
-	// }
-
 }
