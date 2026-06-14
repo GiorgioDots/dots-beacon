@@ -90,3 +90,12 @@ Use [task](https://taskfile.dev/) to run the project locally
 - Run `sqlc generate` from the root folder
 - Run `task migrate-up` to update the local db
   - If it fails, check what failed, fix / drop the migration and re-run it.
+
+# Observability
+
+Traces, metrics, and logs for every service, collected via an OpenTelemetry
+Collector and stored in MinIO (S3) behind Tempo / Loki / Mimir, viewed in
+Grafana (http://localhost:3000).
+
+See [docs/telemetry](docs/telemetry/README.md) — including how to
+[instrument a new service](docs/telemetry/instrumenting-a-service.md).
