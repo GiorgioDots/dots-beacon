@@ -1,4 +1,4 @@
--- name: GetPlants :many
+-- name: ListSites :many
 SELECT
     *
 FROM

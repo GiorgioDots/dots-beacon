@@ -126,11 +126,17 @@ package only authenticates. Build role/permission checks on top of `User.Roles`.
 
 ### Audience note
 
-Keycloak access tokens often have **no `aud`** for the requesting client (or
-`aud: "account"`). That's why `KEYCLOAK_CLIENT_ID` is optional — leaving it empty
-skips the audience check while still fully verifying the signature, issuer, and
-expiry. To enforce an audience, add an audience mapper in Keycloak and set
-`KEYCLOAK_CLIENT_ID`.
+Keycloak access tokens have **no `aud`** for the requesting client by default, so
+a plain setup would fail audience validation. This realm therefore includes an
+**audience mapper** on `dots-beacon-app` (see
+[`keycloak/realm.json`](../../keycloak/realm.json)) that puts `dots-beacon-app`
+into the access token's `aud`. With `KEYCLOAK_CLIENT_ID=dots-beacon-app` set, the
+API enforces that audience — so a token must have been minted for this app, not
+just any client in the realm.
+
+To **disable** audience checking instead, leave `KEYCLOAK_CLIENT_ID` empty; the
+signature, issuer, and expiry are still verified. If you change the mapper or
+client id, the two must agree or you'll get `expected audience … got []`.
 
 ### Issuer note
 

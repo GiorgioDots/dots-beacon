@@ -43,5 +43,5 @@ tasks:
     sources:
       - "**/*.go"
     cmds:
-      - "go build -o ./tmp/main ./cmd/"
+      - "go build -o ./tmp/main ./cmd/api"
       - "./tmp/main"

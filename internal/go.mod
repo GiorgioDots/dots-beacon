@@ -3,6 +3,8 @@ module github.com/giorgio-dots/dots-beacon-internal
 go 1.26.3
 
 require (
+	github.com/coreos/go-oidc/v3 v3.18.0
+	github.com/exaring/otelpgx v0.11.1
 	github.com/gin-gonic/gin v1.12.0
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/rs/zerolog v1.35.1
@@ -26,8 +28,6 @@ require (
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.7 // indirect
-	github.com/coreos/go-oidc/v3 v3.18.0 // indirect
-	github.com/exaring/otelpgx v0.11.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/gin-contrib/sse v1.1.1 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.4 // indirect

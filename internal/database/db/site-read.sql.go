@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const getPlants = `-- name: GetPlants :many
+const listSites = `-- name: ListSites :many
 SELECT
     id, name, is_on
 FROM
@@ -18,8 +18,8 @@ ORDER BY
     name
 `
 
-func (q *Queries) GetPlants(ctx context.Context) ([]Site, error) {
-	rows, err := q.db.Query(ctx, getPlants)
+func (q *Queries) ListSites(ctx context.Context) ([]Site, error) {
+	rows, err := q.db.Query(ctx, listSites)
 	if err != nil {
 		return nil, err
 	}
