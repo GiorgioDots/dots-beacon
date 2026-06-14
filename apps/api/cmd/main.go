@@ -11,6 +11,8 @@ import (
 	"github.com/caarlos0/env/v11"
 	"github.com/gin-gonic/gin"
 	"github.com/giorgio-dots/dots-beacon-api/config"
+	"github.com/giorgio-dots/dots-beacon-internal/database"
+	"github.com/giorgio-dots/dots-beacon-internal/database/db"
 	"github.com/giorgio-dots/dots-beacon-internal/telemetry"
 )
 
@@ -35,6 +37,13 @@ func main() {
 		}
 	}()
 
+	pool, err := database.NewPool(ctx, cfg.DatabaseUrl)
+	if err != nil {
+		telemetry.Log().Fatal().Err(err).Msg("failed to connect to database")
+	}
+	defer pool.Close()
+	queries := db.New(pool)
+
 	if cfg.AppEnv != "dev" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -46,6 +55,16 @@ func main() {
 	r.GET("/healthz", func(c *gin.Context) {
 		telemetry.Log().Info().Ctx(c.Request.Context()).Msg("health check")
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	r.GET("/sites", func(c *gin.Context) {
+		sites, err := queries.GetPlants(c.Request.Context())
+		if err != nil {
+			telemetry.Log().Error().Ctx(c.Request.Context()).Err(err).Msg("failed to list sites")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"sites": sites})
 	})
 
 	srv := &http.Server{

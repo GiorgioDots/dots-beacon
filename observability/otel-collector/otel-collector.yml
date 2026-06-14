@@ -9,6 +9,17 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+  # Postgres server-side metrics (commits, rollbacks, backends, db size, ...).
+  # Connects over the compose network on the internal port 5432.
+  postgresql:
+    endpoint: dots-beacon-dev-db:5432
+    username: ${env:POSTGRES_USER}
+    password: ${env:POSTGRES_PASSWORD}
+    databases:
+      - ${env:POSTGRES_DB}
+    collection_interval: 10s
+    tls:
+      insecure: true
 
 processors:
   # Guard against unbounded memory use under load.
@@ -52,7 +63,7 @@ service:
       processors: [memory_limiter, resource_detection, batch]
       exporters: [otlp_grpc/tempo, debug]
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, postgresql]
       processors: [memory_limiter, resource_detection, batch]
       exporters: [prometheus, debug]
     logs:
