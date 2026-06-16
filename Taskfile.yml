@@ -49,7 +49,5 @@ tasks:
   dev-web:
     desc: Run web app dev server
     dir: "apps/web"
-    deps:
-      - dev-api
     cmds:
       - "pnpm run dev"
