@@ -45,3 +45,11 @@ tasks:
     cmds:
       - "go build -o ./tmp/main ./cmd/api"
       - "./tmp/main"
+  
+  dev-web:
+    desc: Run web app dev server
+    dir: "apps/web"
+    deps:
+      - dev-api
+    cmds:
+      - "pnpm run dev"

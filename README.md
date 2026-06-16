@@ -79,6 +79,7 @@ Requirements for developments:
 - [go >1.26.3](https://go.dev/doc/install)
 - [sqlc](https://docs.sqlc.dev/en/latest/index.html)
 - [golang-migrate](https://github.com/golang-migrate/migrate)
+- [pnpm](https://pnpm.io/)
 
 # Develop
 
