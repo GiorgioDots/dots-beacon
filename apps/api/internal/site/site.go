@@ -3,7 +3,14 @@
 // (devices, users, ...). The flow is always: handler -> service -> repository.
 package site
 
-import "github.com/google/uuid"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
+
+// ErrNotFound is returned when a site does not exist. The handler maps it to 404.
+var ErrNotFound = errors.New("site not found")
 
 // Site is the domain model the API exposes. It is intentionally separate from
 // the sqlc-generated DB row (db.Site) so the HTTP layer never depends on the

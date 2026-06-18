@@ -29,7 +29,6 @@ tasks:
 
   dev-compose:
     desc: Run docker compose locally
-    internal: true
     cmds:
       # --env-file so compose interpolates ${...} (MinIO/Postgres creds) from .env.local
       - docker compose --env-file .env.local up -d --wait
@@ -38,8 +37,6 @@ tasks:
     desc: Run api dev server
     watch: true
     dir: "apps/api"
-    deps:
-      - dev-compose
     sources:
       - "**/*.go"
     cmds:

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/giorgio-dots/dots-beacon-api/internal/config"
 	"github.com/giorgio-dots/dots-beacon-internal/auth"
@@ -35,6 +36,7 @@ func New(cfg config.Config, authenticator *auth.Authenticator, features ...Featu
 
 	engine := gin.New()
 	engine.Use(gin.Recovery())
+	engine.Use(corsMiddleware(cfg)) // handles preflight before auth runs
 	telemetry.InstrumentGin(engine) // traces + HTTP metrics for every route
 
 	// Public routes.
@@ -58,6 +60,25 @@ func New(cfg config.Config, authenticator *auth.Authenticator, features ...Featu
 			Handler: engine,
 		},
 	}
+}
+
+// corsMiddleware builds the CORS handler from config. We use bearer tokens (not
+// cookies), so credentials are off and the Authorization header is allowed for
+// preflight. AllowedOrigins == ["*"] allows any origin; otherwise it's an
+// explicit allow-list.
+func corsMiddleware(cfg config.Config) gin.HandlerFunc {
+	c := cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowCredentials: false,
+		MaxAge:           12 * time.Hour,
+	}
+	if len(cfg.AllowedOrigins) == 1 && cfg.AllowedOrigins[0] == "*" {
+		c.AllowAllOrigins = true
+	} else {
+		c.AllowOrigins = cfg.AllowedOrigins
+	}
+	return cors.New(c)
 }
 
 // Run starts serving and blocks until ctx is cancelled, then shuts down

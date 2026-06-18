@@ -7,7 +7,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <>
-      <Link to="/home">Access the page</Link>
+      <Link to="/home">Access the app</Link>
     </>
   );
 }

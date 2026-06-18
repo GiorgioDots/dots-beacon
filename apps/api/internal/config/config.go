@@ -9,6 +9,10 @@ type Config struct {
 	AppEnv      string `env:"APP_ENV" envDefault:"dev"`
 	HttpPort    string `env:"HTTP_PORT" envDefault:"8080"`
 
+	// CORS allowed origins (comma-separated). "*" allows any origin. Browsers
+	// only enforce this; server-to-server calls ignore it.
+	AllowedOrigins []string `env:"ALLOWED_ORIGINS" envDefault:"http://localhost:5173"`
+
 	// Keycloak (OIDC). Empty KeycloakIssuerURL disables authentication.
 	KeycloakIssuerURL string `env:"KEYCLOAK_ISSUER_URL"`
 	KeycloakClientID  string `env:"KEYCLOAK_CLIENT_ID"`

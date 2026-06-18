@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/giorgio-dots/dots-beacon-api/internal/audit"
 	"github.com/giorgio-dots/dots-beacon-api/internal/config"
 	"github.com/giorgio-dots/dots-beacon-api/internal/server"
 	"github.com/giorgio-dots/dots-beacon-api/internal/site"
@@ -47,15 +48,20 @@ func main() {
 	}
 	defer pool.Close()
 	queries := db.New(pool)
+	tx := database.NewTx(pool) // unit-of-work for atomic multi-write operations
 
 	// Authentication (optional: enabled only when KEYCLOAK_ISSUER_URL is set).
 	authenticator := mustAuth(ctx, cfg)
 
 	// Features. Each is wired repository -> service -> handler, then mounted.
-	sites := site.NewHandler(site.NewService(site.NewRepository(queries)))
+	// The audit repository is shared: site writes record entries through it,
+	// and the audit feature exposes them for reading.
+	auditRepo := audit.NewRepository(queries)
+	auditing := audit.NewHandler(audit.NewService(auditRepo))
+	sites := site.NewHandler(site.NewService(site.NewRepository(queries), auditRepo, tx))
 
 	// HTTP server.
-	srv := server.New(cfg, authenticator, sites)
+	srv := server.New(cfg, authenticator, sites, auditing)
 	if err := srv.Run(ctx); err != nil {
 		telemetry.Log().Fatal().Err(err).Msg("server error")
 	}

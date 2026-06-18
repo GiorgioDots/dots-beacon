@@ -4,6 +4,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(protected)/home/")({
   component: RouteComponent,
+  beforeLoad: async () => {
+    const res = await fetch("http://localhost:8080/sites", {
+      headers: {
+        Authorization: `Bearer ${keycloak.token}`,
+      },
+    });
+    console.log(await res.json());
+  },
 });
 
 function RouteComponent() {
