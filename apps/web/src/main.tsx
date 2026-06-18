@@ -1,20 +1,10 @@
-import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
+import ReactDOM from "react-dom/client";
 import { routeTree } from "./routeTree.gen";
-import keycloak from "./lib/auth/keycloak";
-
-const authenticated = await keycloak.init({
-  onLoad: "login-required",
-});
-if (authenticated) {
-  console.log("User is authenticated");
-} else {
-  console.log("User is not authenticated");
-}
 
 const router = createRouter({
   routeTree,
-  defaultPreload: "intent",
+  defaultPreload: false,
   scrollRestoration: true,
 });
 
