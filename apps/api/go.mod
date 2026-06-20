@@ -9,6 +9,7 @@ replace github.com/giorgio-dots/dots-beacon-internal => ../../internal
 
 require (
 	github.com/caarlos0/env/v11 v11.4.1
+	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-gonic/gin v1.12.0
 	github.com/giorgio-dots/dots-beacon-internal v0.0.0-00010101000000-000000000000
 	github.com/google/uuid v1.6.0
@@ -26,7 +27,6 @@ require (
 	github.com/coreos/go-oidc/v3 v3.18.0 // indirect
 	github.com/exaring/otelpgx v0.11.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
-	github.com/gin-contrib/cors v1.7.7 // indirect
 	github.com/gin-contrib/sse v1.1.1 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
