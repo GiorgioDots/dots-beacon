@@ -8,6 +8,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/giorgiodots/dots-beacon/api/internal/config"
+	"github.com/google/uuid"
+	"github.com/rs/zerolog"
 )
 
 type Feature interface {
@@ -18,7 +20,7 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func New(cfg config.Config, features ...Feature) *Server {
+func New(cfg config.Config, logger zerolog.Logger, features ...Feature) *Server {
 	if !cfg.IsDev() {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -26,6 +28,7 @@ func New(cfg config.Config, features ...Feature) *Server {
 	ngin := gin.New()
 	ngin.Use(gin.Recovery())
 	ngin.Use(corsMiddleware(cfg))
+	ngin.Use(requestLogger(logger))
 
 	ngin.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
@@ -64,4 +67,36 @@ func corsMiddleware(cfg config.Config) gin.HandlerFunc {
 		c.AllowOrigins = cfg.AllowedOrigins
 	}
 	return cors.New(c)
+}
+
+func requestLogger(logger zerolog.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/healthz" {
+			c.Next()
+			return
+		}
+
+		start := time.Now()
+		requestID := uuid.New().String()
+
+		reqLogger := logger.With().Str("request_id", requestID).Logger()
+		c.Request = c.Request.WithContext(reqLogger.WithContext(c.Request.Context()))
+		c.Header("X-Request-ID", requestID)
+
+		c.Next()
+
+		status := c.Writer.Status()
+		ev := reqLogger.Info()
+		if status > 500 {
+			ev = reqLogger.Error()
+		} else if status >= 400 {
+			ev = reqLogger.Warn()
+		}
+		ev.Str("method", c.Request.Method).
+			Str("path", c.Request.URL.Path).
+			Int("status", status).
+			Dur("latency_ms", time.Since(start)).
+			Str("ip", c.ClientIP()).
+			Msg("request")
+	}
 }

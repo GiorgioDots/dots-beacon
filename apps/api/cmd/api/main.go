@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/signal"
 	"syscall"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/giorgiodots/dots-beacon/api/internal/sites"
 	"github.com/giorgiodots/dots-beacon/package/database"
 	"github.com/giorgiodots/dots-beacon/package/database/db"
+	"github.com/rs/zerolog"
 )
 
 func main() {
@@ -23,6 +25,18 @@ func main() {
 		return
 	}
 
+	// Log setup
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	var logger zerolog.Logger
+
+	if cfg.IsDev() {
+		logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	} else {
+		logger = zerolog.New(os.Stderr).With().Timestamp().Str("service", "api").Str("env", cfg.AppEnv).Logger()
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
+
 	dbpool, err := database.NewPool(ctx, cfg.DatabaseUrl)
 	if err != nil {
 		fmt.Printf("An error occured connecting to the database: %v\n", err)
@@ -33,7 +47,7 @@ func main() {
 	queries := db.New(dbpool)
 
 	site := sites.NewHandler(sites.NewService(queries))
-	srv := server.New(cfg, site)
+	srv := server.New(cfg, logger, site)
 
 	if err := srv.Run(ctx); err != nil {
 		fmt.Printf("Failed to run server: %v\n", err)
