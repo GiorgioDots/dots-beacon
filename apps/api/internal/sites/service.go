@@ -1,13 +1,10 @@
 package sites
 
 import (
-	"net/http"
+	"context"
 
-	"github.com/gin-gonic/gin"
-	"github.com/giorgiodots/dots-beacon/api/internal/models"
 	"github.com/giorgiodots/dots-beacon/package/database/db"
 	"github.com/google/uuid"
-	"github.com/rs/zerolog"
 )
 
 type Service struct {
@@ -18,20 +15,17 @@ func NewService(q *db.Queries) *Service {
 	return &Service{q: q}
 }
 
-func (s *Service) getSites(c *gin.Context) {
-	rows, err := s.q.GetSites(c)
-	logger := zerolog.Ctx(c.Request.Context())
+func (s *Service) GetSites(ctx context.Context) ([]Site, error) {
+	rows, err := s.q.GetSites(ctx)
 	if err != nil {
-		logger.Error().Err(err).Msg("failed to get sites")
-		c.JSON(http.StatusInternalServerError, models.NewResponse("Internal error", nil))
-		return
+		return nil, err
 	}
 
 	sites := make([]Site, 0, len(rows))
 	for _, row := range rows {
 		sites = append(sites, toDomain(row))
 	}
-	c.JSON(http.StatusOK, models.NewResponse("ok", gin.H{"sites": sites}))
+	return sites, nil
 }
 
 func toDomain(site db.Site) Site {
