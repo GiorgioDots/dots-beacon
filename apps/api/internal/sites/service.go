@@ -28,6 +28,15 @@ func (s *Service) GetSites(ctx context.Context) ([]Site, error) {
 	return sites, nil
 }
 
+func (s *Service) CreateSite(ctx context.Context, name string) (Site, error) {
+	site, err := s.q.CreateSite(ctx, name)
+	if err != nil {
+		return Site{}, err
+	}
+
+	return toDomain(site), nil
+}
+
 func toDomain(site db.Site) Site {
 	return Site{
 		ID:   uuid.UUID(site.ID.Bytes),

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/danielkov/gin-helmet/ginhelmet"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/giorgiodots/dots-beacon/api/internal/config"
@@ -27,6 +28,7 @@ func New(cfg config.Config, logger zerolog.Logger, features ...Feature) *Server 
 
 	ngin := gin.New()
 	ngin.Use(gin.Recovery())
+	ngin.Use(ginhelmet.Default())
 	ngin.Use(corsMiddleware(cfg))
 	ngin.Use(requestLogger(logger))
 

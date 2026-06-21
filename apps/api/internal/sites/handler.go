@@ -19,6 +19,7 @@ func NewHandler(svc *Service) *Handler {
 func (h *Handler) RegisterRoutes(r gin.IRouter) {
 	grp := r.Group("/sites")
 	grp.GET("/", h.GetSites)
+	grp.POST("/", h.CreateSite)
 }
 
 func (h *Handler) GetSites(c *gin.Context) {
@@ -30,4 +31,22 @@ func (h *Handler) GetSites(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"sites": sites})
+}
+
+func (h *Handler) CreateSite(c *gin.Context) {
+	logger := zerolog.Ctx(c.Request.Context())
+	var body CreateSiteBody
+	if err := c.ShouldBind(&body); err != nil {
+		logger.Error().Err(err).Msg("create site body not valid")
+		respond.Err(c, http.StatusUnprocessableEntity, "invalid request")
+		return
+	}
+
+	site, err := h.svc.CreateSite(c.Request.Context(), body.Name)
+	if err != nil {
+		logger.Error().Err(err).Msg("failed to create site")
+		respond.Err(c, http.StatusUnprocessableEntity, "invalid error")
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"craeted": site})
 }
