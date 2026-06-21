@@ -1,0 +1,173 @@
+services:
+  dots-beacon-dev-db:
+    image: "postgres:18"
+    ports:
+      - 5433:5432
+    env_file:
+      .env.local
+    volumes:
+      - ./data/db/:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.153.0@sha256:93aad750175cbf1a973ae1c5886c3371f4d800f61be25cdd26870b8441ffe9fa
+    command: ["--config=/etc/otel-collector.yml"]
+    # Only the vars the postgresql receiver needs — NOT the app's OTEL_* vars,
+    # which would make the collector self-instrument toward itself.
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./observability/otel-collector/otel-collector.yml:/etc/otel-collector.yml
+    ports:
+      - 4317:4317   # OTLP gRPC (services export here)
+      - 4318:4318   # OTLP HTTP
+    depends_on:
+      tempo:
+        condition: service_started
+      loki:
+        condition: service_started
+      dots-beacon-dev-db:
+        condition: service_healthy
+
+  minio:
+    image: minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    ports:
+      - 9000:9000   # S3 API
+      - 9001:9001   # Web console
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # One-shot: create the telemetry buckets, then exit.
+  minio-init:
+    image: minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      TEMPO_S3_BUCKET: ${TEMPO_S3_BUCKET}
+      LOKI_S3_BUCKET: ${LOKI_S3_BUCKET}
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" &&
+        mc mb --ignore-existing local/"$$TEMPO_S3_BUCKET" &&
+        mc mb --ignore-existing local/"$$LOKI_S3_BUCKET" &&
+        mc mb --ignore-existing local/mimir-blocks &&
+        mc mb --ignore-existing local/mimir-ruler &&
+        echo "buckets ready"
+    restart: "no"
+
+  tempo:
+    image: grafana/tempo:2.9.0
+    command: ["-config.file=/etc/tempo.yml", "-config.expand-env=true"]
+    # Only S3 vars — NOT the app's OTEL_* vars (those made Tempo self-trace).
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      TEMPO_S3_BUCKET: ${TEMPO_S3_BUCKET}
+    volumes:
+      - ./observability/tempo/tempo.yml:/etc/tempo.yml
+      - tempo-data:/var/tempo
+    ports:
+      - 3200:3200   # Tempo API/UI query
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+
+  loki:
+    image: grafana/loki:3.5.0
+    command: ["-config.file=/etc/loki/loki.yml", "-config.expand-env=true"]
+    # Only S3 vars — NOT the app's OTEL_* vars (those made Loki self-trace).
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      LOKI_S3_BUCKET: ${LOKI_S3_BUCKET}
+    volumes:
+      - ./observability/loki/loki.yml:/etc/loki/loki.yml
+      - loki-data:/loki
+    ports:
+      - 3100:3100
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+
+  # Prometheus-compatible metrics store backed by MinIO (S3). The collector
+  # remote-writes metrics here; Grafana queries via /prometheus.
+  mimir:
+    image: grafana/mimir:3.1.1@sha256:2b49dca9ee4a121cc39bfb1e6f661c1e975cf52a7d14cc6b90de2e5e29caa92e
+    command: ["-config.file=/etc/mimir.yml", "-config.expand-env=true"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./observability/mimir/mimir.yml:/etc/mimir.yml
+      - mimir-data:/data
+    ports:
+      - 9009:9009   # HTTP (remote-write + query API)
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+
+  grafana:
+    image: grafana/grafana:12.2.0
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+    ports:
+      - 3000:3000
+    depends_on:
+      - mimir
+      - tempo
+      - loki
+
+  # Identity provider. Dev mode (H2, persisted to a volume) with the dots-beacon
+  # realm pre-seeded from keycloak/realm.json on first start.
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.3@sha256:5fdbf2dbb5897cc34e82de49d13e23db011f9925089dbc555fc095f2c8bc1dac
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HEALTH_ENABLED: "true"
+    volumes:
+      - ./keycloak/realm.json:/opt/keycloak/data/import/realm.json:ro
+      - keycloak-data:/opt/keycloak/data
+    ports:
+      - 8081:8080   # auth endpoints / admin console (8080 is the API's port)
+    healthcheck:
+      # No curl in the image; probe the management health port over /dev/tcp.
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '200 OK' <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+volumes:
+  minio-data:
+  keycloak-data:
+  mimir-data:
+  tempo-data:
+  loki-data:
+  grafana-data:

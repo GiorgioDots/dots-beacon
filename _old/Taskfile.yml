@@ -19,13 +19,13 @@ tasks:
     deps:
       - dev-compose
     cmds:
-      - migrate -path package/database/migrations -database {{.DATABASE_URL}} up
+      - migrate -path internal/database/migrations -database {{.DATABASE_URL}} up
 
   migrate-down:
     deps:
       - dev-compose
     cmds:
-      - migrate -path package/database/migrations -database {{.DATABASE_URL}} down
+      - migrate -path internal/database/migrations -database {{.DATABASE_URL}} down
 
   dev-compose:
     desc: Run docker compose locally
@@ -43,3 +43,8 @@ tasks:
       - "go build -o ./tmp/main ./cmd/api"
       - "./tmp/main"
   
+  dev-web:
+    desc: Run web app dev server
+    dir: "apps/web"
+    cmds:
+      - "pnpm run dev"

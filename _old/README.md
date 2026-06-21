@@ -91,3 +91,29 @@ Use [task](https://taskfile.dev/) to run the project locally
 - Run `sqlc generate` from the root folder
 - Run `task migrate-up` to update the local db
   - If it fails, check what failed, fix / drop the migration and re-run it.
+
+# Observability
+
+Traces, metrics, and logs for every service, collected via an OpenTelemetry
+Collector and stored in MinIO (S3) behind Tempo / Loki / Mimir, viewed in
+Grafana (http://localhost:3000).
+
+See [docs/telemetry](docs/telemetry/README.md) — including how to
+[instrument a new service](docs/telemetry/instrumenting-a-service.md).
+
+# Authentication
+
+Keycloak is the identity provider (login + users); the APIs verify its tokens via
+the shared [`internal/auth`](internal/auth/) package. The dev stack pre-seeds a
+realm, client, and test user.
+
+See [docs/auth](docs/auth/README.md).
+
+# Auditing
+
+State-changing business actions are recorded in an append-only `audit_log` table
+in Postgres, written **in the same transaction as the change** and stamped with
+the request's `trace_id` for one-click correlation to traces/logs. This is
+deliberately separate from observability (which is sampled and best-effort).
+
+See [docs/audit](docs/audit/README.md).
