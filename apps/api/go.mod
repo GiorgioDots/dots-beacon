@@ -9,6 +9,7 @@ require (
 	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-gonic/gin v1.12.0
 	github.com/giorgiodots/dots-beacon/package v0.0.0-00010101000000-000000000000
+	github.com/google/uuid v1.6.0
 )
 
 require (
