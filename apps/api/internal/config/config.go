@@ -10,6 +10,10 @@ type Config struct {
 	// CORS allowed origins (comma-separated). "*" allows any origin. Browsers
 	// only enforce this; server-to-server calls ignore it.
 	AllowedOrigins []string `env:"ALLOWED_ORIGINS" envDefault:"http://localhost:5173"`
+
+	// Auth
+	OidUrl      string `env:"OID_URL"`
+	OidClientId string `env:"OID_CLIENT_ID"`
 }
 
 // Load reads configuration from environment variables.

@@ -1,0 +1,65 @@
+{
+  "realm": "dots-beacon",
+  "enabled": true,
+  "displayName": "dots-beacon",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "registrationEmailAsUsername": false,
+  "rememberMe": true,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "clients": [
+    {
+      "clientId": "dots-beacon-app",
+      "name": "dots-beacon application",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "I>ShD>dR)3@)4ZnR--EKgN:oaC,fyR-)rY$VIeJ:HOy",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "fullScopeAllowed": false,
+      "redirectUris": ["http://localhost:5173/*", "http://localhost:8080/*"],
+      "webOrigins": ["+"],
+      "attributes": {
+        "post.logout.redirect.uris": "+",
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+
+  "users": [
+    {
+      "username": "god",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "god@dots-beacon.local",
+      "firstName": "Site",
+      "lastName": "Admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "m+Bm3D+ir*>_r#%+hqA,",
+          "temporary": true
+        }
+      ]
+    },
+    {
+      "username": "service-account-dots-beacon-app",
+      "enabled": true,
+      "serviceAccountClientId": "dots-beacon-app",
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-users", "query-users"]
+      }
+    }
+  ]
+}

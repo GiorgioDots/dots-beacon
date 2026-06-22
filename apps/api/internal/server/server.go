@@ -3,12 +3,15 @@ package server
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/danielkov/gin-helmet/ginhelmet"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/giorgiodots/dots-beacon/api/internal/auth"
 	"github.com/giorgiodots/dots-beacon/api/internal/config"
+	"github.com/giorgiodots/dots-beacon/api/internal/respond"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
@@ -100,5 +103,20 @@ func requestLogger(logger zerolog.Logger) gin.HandlerFunc {
 			Dur("latency_ms", time.Since(start)).
 			Str("ip", c.ClientIP()).
 			Msg("request")
+	}
+}
+
+func authMiddleware(v *auth.AuthVerifier) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		raw := strings.TrimPrefix(c.Request.Header.Get("Authorization"), "Bearer ")
+
+		result, err := v.Verify(c.Request.Context(), raw)
+
+		if err != nil {
+			respond.Err(c, http.StatusUnauthorized, "Not authenticated")
+			return
+		}
+
+		SetUserId(c, result.Sub)
 	}
 }

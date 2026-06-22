@@ -6,6 +6,7 @@ replace github.com/giorgiodots/dots-beacon/package => ../../package
 
 require (
 	github.com/caarlos0/env/v11 v11.4.1
+	github.com/danielkov/gin-helmet/ginhelmet v1.0.2
 	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-gonic/gin v1.12.0
 	github.com/giorgiodots/dots-beacon/package v0.0.0-00010101000000-000000000000
@@ -14,12 +15,17 @@ require (
 )
 
 require (
+	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
+	golang.org/x/oauth2 v0.36.0 // indirect
+)
+
+require (
 	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/bytedance/sonic v1.15.0 // indirect
 	github.com/bytedance/sonic/loader v0.5.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
+	github.com/coreos/go-oidc/v3 v3.19.0
 	github.com/danielkov/gin-helmet/core v1.0.1 // indirect
-	github.com/danielkov/gin-helmet/ginhelmet v1.0.2 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/gin-contrib/sse v1.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
