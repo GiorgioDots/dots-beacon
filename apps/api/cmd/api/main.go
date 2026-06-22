@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/giorgiodots/dots-beacon/api/internal/auth"
 	"github.com/giorgiodots/dots-beacon/api/internal/config"
 	"github.com/giorgiodots/dots-beacon/api/internal/server"
 	"github.com/giorgiodots/dots-beacon/api/internal/sites"
@@ -39,15 +40,21 @@ func main() {
 
 	dbpool, err := database.NewPool(ctx, cfg.DatabaseUrl)
 	if err != nil {
-		fmt.Printf("An error occured connecting to the database: %v\n", err)
+		fmt.Printf("An error occured while connecting to the database: %v\n", err)
 		return
 	}
 	defer dbpool.Close()
 
 	queries := db.New(dbpool)
 
+	auth, err := auth.NewAuthVerifier(ctx, cfg)
+	if err != nil {
+		fmt.Printf("An error occured during auth initialization: %v\n", err)
+		return
+	}
+
 	site := sites.NewHandler(sites.NewService(queries))
-	srv := server.New(cfg, logger, site)
+	srv := server.New(cfg, logger, auth, site)
 
 	if err := srv.Run(ctx); err != nil {
 		fmt.Printf("Failed to run server: %v\n", err)

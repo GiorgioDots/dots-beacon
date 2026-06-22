@@ -16,10 +16,11 @@ func NewHandler(svc *Service) *Handler {
 	return &Handler{svc: svc}
 }
 
-func (h *Handler) RegisterRoutes(r gin.IRouter) {
+func (h *Handler) RegisterRoutes(r gin.IRouter, authMW gin.HandlerFunc) {
 	grp := r.Group("/sites")
-	grp.GET("/", h.GetSites)
-	grp.POST("/", h.CreateSite)
+	authenticated := grp.Use(authMW)
+	authenticated.GET("/", h.GetSites)
+	authenticated.POST("/", h.CreateSite)
 }
 
 func (h *Handler) GetSites(c *gin.Context) {

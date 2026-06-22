@@ -7,7 +7,7 @@ import (
 	"github.com/giorgiodots/dots-beacon/api/internal/config"
 )
 
-type AuthVerifier struct {
+type Authenticator struct {
 	provider *oidc.Provider
 	verifier *oidc.IDTokenVerifier
 }
@@ -16,7 +16,7 @@ type Claims struct {
 	Sub string `json:"sub"`
 }
 
-func NewAuthVerifier(ctx context.Context, cfg config.Config) (*AuthVerifier, error) {
+func NewAuthVerifier(ctx context.Context, cfg config.Config) (*Authenticator, error) {
 	provider, err := oidc.NewProvider(ctx, cfg.OidUrl)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func NewAuthVerifier(ctx context.Context, cfg config.Config) (*AuthVerifier, err
 
 	verifier := provider.Verifier(&oidc.Config{ClientID: cfg.OidClientId})
 
-	auth := &AuthVerifier{
+	auth := &Authenticator{
 		provider: provider,
 		verifier: verifier,
 	}
@@ -32,7 +32,7 @@ func NewAuthVerifier(ctx context.Context, cfg config.Config) (*AuthVerifier, err
 	return auth, nil
 }
 
-func (v *AuthVerifier) Verify(ctx context.Context, token string) (*Claims, error) {
+func (v *Authenticator) Verify(ctx context.Context, token string) (*Claims, error) {
 	idToken, err := v.verifier.Verify(ctx, token)
 	if err != nil {
 		return nil, err

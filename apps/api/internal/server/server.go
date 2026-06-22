@@ -11,20 +11,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/giorgiodots/dots-beacon/api/internal/auth"
 	"github.com/giorgiodots/dots-beacon/api/internal/config"
-	"github.com/giorgiodots/dots-beacon/api/internal/respond"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
 
 type Feature interface {
-	RegisterRoutes(r gin.IRouter)
+	RegisterRoutes(r gin.IRouter, authMW gin.HandlerFunc)
 }
 
 type Server struct {
 	httpServer *http.Server
 }
 
-func New(cfg config.Config, logger zerolog.Logger, features ...Feature) *Server {
+func New(cfg config.Config, logger zerolog.Logger, auth *auth.Authenticator, features ...Feature) *Server {
 	if !cfg.IsDev() {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -33,15 +32,18 @@ func New(cfg config.Config, logger zerolog.Logger, features ...Feature) *Server 
 	ngin.Use(gin.Recovery())
 	ngin.Use(ginhelmet.Default())
 	ngin.Use(corsMiddleware(cfg))
-	ngin.Use(requestLogger(logger))
 
 	ngin.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
+	authMW := newAuthMiddleware(auth)
+
 	for _, f := range features {
-		f.RegisterRoutes(ngin)
+		f.RegisterRoutes(ngin, authMW)
 	}
+
+	ngin.Use(requestLogger(logger))
 
 	return &Server{
 		httpServer: &http.Server{
@@ -106,17 +108,23 @@ func requestLogger(logger zerolog.Logger) gin.HandlerFunc {
 	}
 }
 
-func authMiddleware(v *auth.AuthVerifier) gin.HandlerFunc {
+func newAuthMiddleware(v *auth.Authenticator) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		raw := strings.TrimPrefix(c.Request.Header.Get("Authorization"), "Bearer ")
 
 		result, err := v.Verify(c.Request.Context(), raw)
 
 		if err != nil {
-			respond.Err(c, http.StatusUnauthorized, "Not authenticated")
+			unauthorized(c, "not authorized")
 			return
 		}
-
 		SetUserId(c, result.Sub)
+
+		c.Next()
 	}
+}
+
+func unauthorized(c *gin.Context, msg string) {
+	c.Header("WWW-Authenticate", `Bearer error="invalid_token"`)
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": msg})
 }
