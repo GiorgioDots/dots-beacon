@@ -27,7 +27,7 @@ tasks:
     cmds:
       - migrate -path package/database/migrations -database {{.DATABASE_URL}} down
 
-  dev-compose:
+  compose:
     desc: Run docker compose locally
     cmds:
       # --env-file so compose interpolates ${...} (MinIO/Postgres creds) from .env.local
