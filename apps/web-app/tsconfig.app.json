@@ -4,6 +4,6 @@
     "outDir": "./out-tsc/app",
     "types": []
   },
-  "include": ["src/**/*.ts", "src/libs/ui/**/src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/libs/ui/**/src/**/*.ts", "src/app/libs/ui/**/src/**/*.ts"],
   "exclude": ["src/**/*.spec.ts"]
 }
