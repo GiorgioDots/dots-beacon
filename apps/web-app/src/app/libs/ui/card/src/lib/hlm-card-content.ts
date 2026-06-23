@@ -1,12 +1,12 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmCardContent]',
-  host: { 'data-slot': 'card-content' },
+    selector: '[hlmCardContent]',
+    host: { 'data-slot': 'card-content' },
 })
 export class HlmCardContent {
-  constructor() {
-    classes(() => 'px-(--card-spacing)');
-  }
+    constructor() {
+        classes(() => 'px-(--card-spacing)')
+    }
 }

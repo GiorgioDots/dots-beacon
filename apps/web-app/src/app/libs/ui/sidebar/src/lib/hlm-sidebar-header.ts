@@ -1,15 +1,15 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmSidebarHeader],hlm-sidebar-header',
-  host: {
-    'data-slot': 'sidebar-header',
-    'data-sidebar': 'header',
-  },
+    selector: '[hlmSidebarHeader],hlm-sidebar-header',
+    host: {
+        'data-slot': 'sidebar-header',
+        'data-sidebar': 'header',
+    },
 })
 export class HlmSidebarHeader {
-  constructor() {
-    classes(() => 'gap-2 p-2 flex flex-col');
-  }
+    constructor() {
+        classes(() => 'gap-2 p-2 flex flex-col')
+    }
 }

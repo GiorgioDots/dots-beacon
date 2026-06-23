@@ -1,12 +1,12 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: 'ul[hlmPaginationContent]',
-  host: { 'data-slot': 'pagination-content' },
+    selector: 'ul[hlmPaginationContent]',
+    host: { 'data-slot': 'pagination-content' },
 })
 export class HlmPaginationContent {
-  constructor() {
-    classes(() => 'gap-1 flex items-center');
-  }
+    constructor() {
+        classes(() => 'gap-1 flex items-center')
+    }
 }

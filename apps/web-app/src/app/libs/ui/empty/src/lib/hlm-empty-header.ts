@@ -1,12 +1,12 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmEmptyHeader],hlm-empty-header',
-  host: { 'data-slot': 'empty-header' },
+    selector: '[hlmEmptyHeader],hlm-empty-header',
+    host: { 'data-slot': 'empty-header' },
 })
 export class HlmEmptyHeader {
-  constructor() {
-    classes(() => 'gap-2 flex max-w-sm flex-col items-center');
-  }
+    constructor() {
+        classes(() => 'gap-2 flex max-w-sm flex-col items-center')
+    }
 }

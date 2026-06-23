@@ -1,19 +1,19 @@
-import { Directive, inject } from '@angular/core';
-import { BrnAvatarImage } from '@spartan-ng/brain/avatar';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive, inject } from '@angular/core'
+import { BrnAvatarImage } from '@spartan-ng/brain/avatar'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: 'img[hlmAvatarImage]',
-  exportAs: 'hlmAvatarImage',
-  hostDirectives: [BrnAvatarImage],
-  host: {
-    'data-slot': 'avatar-image',
-  },
+    selector: 'img[hlmAvatarImage]',
+    exportAs: 'hlmAvatarImage',
+    hostDirectives: [BrnAvatarImage],
+    host: {
+        'data-slot': 'avatar-image',
+    },
 })
 export class HlmAvatarImage {
-  public readonly canShow = inject(BrnAvatarImage).canShow;
+    public readonly canShow = inject(BrnAvatarImage).canShow
 
-  constructor() {
-    classes(() => 'rounded-full aspect-square size-full object-cover');
-  }
+    constructor() {
+        classes(() => 'rounded-full aspect-square size-full object-cover')
+    }
 }

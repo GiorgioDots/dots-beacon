@@ -1,16 +1,18 @@
-import { Directive } from '@angular/core';
-import { BrnAccordion } from '@spartan-ng/brain/accordion';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { BrnAccordion } from '@spartan-ng/brain/accordion'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmAccordion], hlm-accordion',
-  hostDirectives: [{ directive: BrnAccordion, inputs: ['type', 'orientation'] }],
-  host: {
-    'data-slot': 'accordion',
-  },
+    selector: '[hlmAccordion], hlm-accordion',
+    hostDirectives: [
+        { directive: BrnAccordion, inputs: ['type', 'orientation'] },
+    ],
+    host: {
+        'data-slot': 'accordion',
+    },
 })
 export class HlmAccordion {
-  constructor() {
-    classes(() => 'flex w-full flex-col');
-  }
+    constructor() {
+        classes(() => 'flex w-full flex-col')
+    }
 }

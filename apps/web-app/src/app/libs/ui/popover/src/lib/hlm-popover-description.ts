@@ -1,12 +1,12 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmPopoverDescription]',
-  host: { 'data-slot': 'popover-description' },
+    selector: '[hlmPopoverDescription]',
+    host: { 'data-slot': 'popover-description' },
 })
 export class HlmPopoverDescription {
-  constructor() {
-    classes(() => 'text-muted-foreground');
-  }
+    constructor() {
+        classes(() => 'text-muted-foreground')
+    }
 }

@@ -1,12 +1,15 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmCardTitle]',
-  host: { 'data-slot': 'card-title' },
+    selector: '[hlmCardTitle]',
+    host: { 'data-slot': 'card-title' },
 })
 export class HlmCardTitle {
-  constructor() {
-    classes(() => 'text-base leading-normal font-medium group-data-[size=sm]/card:text-sm');
-  }
+    constructor() {
+        classes(
+            () =>
+                'text-base leading-normal font-medium group-data-[size=sm]/card:text-sm'
+        )
+    }
 }

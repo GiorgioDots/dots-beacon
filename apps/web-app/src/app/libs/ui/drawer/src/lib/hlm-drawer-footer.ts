@@ -1,12 +1,12 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmDrawerFooter],hlm-drawer-footer',
-  host: { 'data-slot': 'drawer-footer' },
+    selector: '[hlmDrawerFooter],hlm-drawer-footer',
+    host: { 'data-slot': 'drawer-footer' },
 })
 export class HlmDrawerFooter {
-  constructor() {
-    classes(() => 'gap-2 p-4 mt-auto flex flex-col');
-  }
+    constructor() {
+        classes(() => 'gap-2 p-4 mt-auto flex flex-col')
+    }
 }

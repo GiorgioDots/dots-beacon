@@ -1,12 +1,14 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmFieldContent],hlm-field-content',
-  host: { 'data-slot': 'field-content' },
+    selector: '[hlmFieldContent],hlm-field-content',
+    host: { 'data-slot': 'field-content' },
 })
 export class HlmFieldContent {
-  constructor() {
-    classes(() => 'gap-1 group/field-content flex flex-1 flex-col leading-snug');
-  }
+    constructor() {
+        classes(
+            () => 'gap-1 group/field-content flex flex-1 flex-col leading-snug'
+        )
+    }
 }

@@ -1,14 +1,14 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmCommandEmpty]',
-  host: {
-    'data-slot': 'command-empty',
-  },
+    selector: '[hlmCommandEmpty]',
+    host: {
+        'data-slot': 'command-empty',
+    },
 })
 export class HlmCommandEmpty {
-  constructor() {
-    classes(() => 'py-6 text-center text-sm');
-  }
+    constructor() {
+        classes(() => 'py-6 text-center text-sm')
+    }
 }

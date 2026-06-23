@@ -1,9 +1,9 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({ selector: '[hlmSelectValuesContent],hlm-select-values-content' })
 export class HlmSelectValuesContent {
-  constructor() {
-    classes(() => 'gap-2 flex');
-  }
+    constructor() {
+        classes(() => 'gap-2 flex')
+    }
 }

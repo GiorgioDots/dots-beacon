@@ -1,14 +1,15 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmCardFooter],hlm-card-footer',
-  host: { 'data-slot': 'card-footer' },
+    selector: '[hlmCardFooter],hlm-card-footer',
+    host: { 'data-slot': 'card-footer' },
 })
 export class HlmCardFooter {
-  constructor() {
-    classes(
-      () => 'rounded-b-xl px-(--card-spacing) [.border-t]:pt-(--card-spacing) flex items-center',
-    );
-  }
+    constructor() {
+        classes(
+            () =>
+                'rounded-b-xl px-(--card-spacing) [.border-t]:pt-(--card-spacing) flex items-center'
+        )
+    }
 }

@@ -1,12 +1,12 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmItemHeader],hlm-item-header',
-  host: { 'data-slot': 'item-header' },
+    selector: '[hlmItemHeader],hlm-item-header',
+    host: { 'data-slot': 'item-header' },
 })
 export class HlmItemHeader {
-  constructor() {
-    classes(() => 'gap-2 flex basis-full items-center justify-between');
-  }
+    constructor() {
+        classes(() => 'gap-2 flex basis-full items-center justify-between')
+    }
 }

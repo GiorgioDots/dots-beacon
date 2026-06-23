@@ -1,13 +1,13 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
-export const hlmP = 'leading-7 [&:not(:first-child)]:mt-6';
+export const hlmP = 'leading-7 [&:not(:first-child)]:mt-6'
 
 @Directive({
-  selector: '[hlmP]',
+    selector: '[hlmP]',
 })
 export class HlmP {
-  constructor() {
-    classes(() => hlmP);
-  }
+    constructor() {
+        classes(() => hlmP)
+    }
 }

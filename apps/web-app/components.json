@@ -1,4 +1,4 @@
 {
-  "componentsPath": "src/app/libs/ui",
-  "importAlias": "@dots-beacon/ui"
+    "componentsPath": "src/app/libs/ui",
+    "importAlias": "@dots-beacon/ui"
 }

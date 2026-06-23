@@ -1,13 +1,13 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
-export const hlmLarge = 'text-lg font-semibold';
+export const hlmLarge = 'text-lg font-semibold'
 
 @Directive({
-  selector: '[hlmLarge]',
+    selector: '[hlmLarge]',
 })
 export class HlmLarge {
-  constructor() {
-    classes(() => hlmLarge);
-  }
+    constructor() {
+        classes(() => hlmLarge)
+    }
 }

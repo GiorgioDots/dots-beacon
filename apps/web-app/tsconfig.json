@@ -1,88 +1,158 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "isolatedModules": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "ES2022",
-    "module": "preserve",
-    "paths": {
-      "@dots-beacon/ui/accordion": ["./src/app/libs/ui/accordion/src/index.ts"],
-      "@dots-beacon/ui/alert": ["./src/app/libs/ui/alert/src/index.ts"],
-      "@dots-beacon/ui/alert-dialog": ["./src/app/libs/ui/alert-dialog/src/index.ts"],
-      "@dots-beacon/ui/aspect-ratio": ["./src/app/libs/ui/aspect-ratio/src/index.ts"],
-      "@dots-beacon/ui/autocomplete": ["./src/app/libs/ui/autocomplete/src/index.ts"],
-      "@dots-beacon/ui/avatar": ["./src/app/libs/ui/avatar/src/index.ts"],
-      "@dots-beacon/ui/badge": ["./src/app/libs/ui/badge/src/index.ts"],
-      "@dots-beacon/ui/breadcrumb": ["./src/app/libs/ui/breadcrumb/src/index.ts"],
-      "@dots-beacon/ui/button": ["./src/app/libs/ui/button/src/index.ts"],
-      "@dots-beacon/ui/button-group": ["./src/app/libs/ui/button-group/src/index.ts"],
-      "@dots-beacon/ui/calendar": ["./src/app/libs/ui/calendar/src/index.ts"],
-      "@dots-beacon/ui/card": ["./src/app/libs/ui/card/src/index.ts"],
-      "@dots-beacon/ui/carousel": ["./src/app/libs/ui/carousel/src/index.ts"],
-      "@dots-beacon/ui/checkbox": ["./src/app/libs/ui/checkbox/src/index.ts"],
-      "@dots-beacon/ui/collapsible": ["./src/app/libs/ui/collapsible/src/index.ts"],
-      "@dots-beacon/ui/combobox": ["./src/app/libs/ui/combobox/src/index.ts"],
-      "@dots-beacon/ui/command": ["./src/app/libs/ui/command/src/index.ts"],
-      "@dots-beacon/ui/context-menu": ["./src/app/libs/ui/context-menu/src/index.ts"],
-      "@dots-beacon/ui/date-picker": ["./src/app/libs/ui/date-picker/src/index.ts"],
-      "@dots-beacon/ui/dialog": ["./src/app/libs/ui/dialog/src/index.ts"],
-      "@dots-beacon/ui/drawer": ["./src/app/libs/ui/drawer/src/index.ts"],
-      "@dots-beacon/ui/dropdown-menu": ["./src/app/libs/ui/dropdown-menu/src/index.ts"],
-      "@dots-beacon/ui/empty": ["./src/app/libs/ui/empty/src/index.ts"],
-      "@dots-beacon/ui/field": ["./src/app/libs/ui/field/src/index.ts"],
-      "@dots-beacon/ui/hover-card": ["./src/app/libs/ui/hover-card/src/index.ts"],
-      "@dots-beacon/ui/input": ["./src/app/libs/ui/input/src/index.ts"],
-      "@dots-beacon/ui/input-group": ["./src/app/libs/ui/input-group/src/index.ts"],
-      "@dots-beacon/ui/input-otp": ["./src/app/libs/ui/input-otp/src/index.ts"],
-      "@dots-beacon/ui/item": ["./src/app/libs/ui/item/src/index.ts"],
-      "@dots-beacon/ui/kbd": ["./src/app/libs/ui/kbd/src/index.ts"],
-      "@dots-beacon/ui/label": ["./src/app/libs/ui/label/src/index.ts"],
-      "@dots-beacon/ui/menubar": ["./src/app/libs/ui/menubar/src/index.ts"],
-      "@dots-beacon/ui/native-select": ["./src/app/libs/ui/native-select/src/index.ts"],
-      "@dots-beacon/ui/navigation-menu": ["./src/app/libs/ui/navigation-menu/src/index.ts"],
-      "@dots-beacon/ui/pagination": ["./src/app/libs/ui/pagination/src/index.ts"],
-      "@dots-beacon/ui/popover": ["./src/app/libs/ui/popover/src/index.ts"],
-      "@dots-beacon/ui/progress": ["./src/app/libs/ui/progress/src/index.ts"],
-      "@dots-beacon/ui/radio-group": ["./src/app/libs/ui/radio-group/src/index.ts"],
-      "@dots-beacon/ui/resizable": ["./src/app/libs/ui/resizable/src/index.ts"],
-      "@dots-beacon/ui/scroll-area": ["./src/app/libs/ui/scroll-area/src/index.ts"],
-      "@dots-beacon/ui/select": ["./src/app/libs/ui/select/src/index.ts"],
-      "@dots-beacon/ui/separator": ["./src/app/libs/ui/separator/src/index.ts"],
-      "@dots-beacon/ui/sheet": ["./src/app/libs/ui/sheet/src/index.ts"],
-      "@dots-beacon/ui/sidebar": ["./src/app/libs/ui/sidebar/src/index.ts"],
-      "@dots-beacon/ui/skeleton": ["./src/app/libs/ui/skeleton/src/index.ts"],
-      "@dots-beacon/ui/slider": ["./src/app/libs/ui/slider/src/index.ts"],
-      "@dots-beacon/ui/sonner": ["./src/app/libs/ui/sonner/src/index.ts"],
-      "@dots-beacon/ui/spinner": ["./src/app/libs/ui/spinner/src/index.ts"],
-      "@dots-beacon/ui/switch": ["./src/app/libs/ui/switch/src/index.ts"],
-      "@dots-beacon/ui/table": ["./src/app/libs/ui/table/src/index.ts"],
-      "@dots-beacon/ui/tabs": ["./src/app/libs/ui/tabs/src/index.ts"],
-      "@dots-beacon/ui/textarea": ["./src/app/libs/ui/textarea/src/index.ts"],
-      "@dots-beacon/ui/toggle": ["./src/app/libs/ui/toggle/src/index.ts"],
-      "@dots-beacon/ui/toggle-group": ["./src/app/libs/ui/toggle-group/src/index.ts"],
-      "@dots-beacon/ui/tooltip": ["./src/app/libs/ui/tooltip/src/index.ts"],
-      "@dots-beacon/ui/typography": ["./src/app/libs/ui/typography/src/index.ts"],
-      "@dots-beacon/ui/utils": ["./src/app/libs/ui/utils/src/index.ts"]
-    }
-  },
-  "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true
-  },
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
+    "compileOnSave": false,
+    "compilerOptions": {
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "skipLibCheck": true,
+        "isolatedModules": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "target": "ES2022",
+        "module": "preserve",
+        "paths": {
+            "@dots-beacon/ui/accordion": [
+                "./src/app/libs/ui/accordion/src/index.ts"
+            ],
+            "@dots-beacon/ui/alert": ["./src/app/libs/ui/alert/src/index.ts"],
+            "@dots-beacon/ui/alert-dialog": [
+                "./src/app/libs/ui/alert-dialog/src/index.ts"
+            ],
+            "@dots-beacon/ui/aspect-ratio": [
+                "./src/app/libs/ui/aspect-ratio/src/index.ts"
+            ],
+            "@dots-beacon/ui/autocomplete": [
+                "./src/app/libs/ui/autocomplete/src/index.ts"
+            ],
+            "@dots-beacon/ui/avatar": ["./src/app/libs/ui/avatar/src/index.ts"],
+            "@dots-beacon/ui/badge": ["./src/app/libs/ui/badge/src/index.ts"],
+            "@dots-beacon/ui/breadcrumb": [
+                "./src/app/libs/ui/breadcrumb/src/index.ts"
+            ],
+            "@dots-beacon/ui/button": ["./src/app/libs/ui/button/src/index.ts"],
+            "@dots-beacon/ui/button-group": [
+                "./src/app/libs/ui/button-group/src/index.ts"
+            ],
+            "@dots-beacon/ui/calendar": [
+                "./src/app/libs/ui/calendar/src/index.ts"
+            ],
+            "@dots-beacon/ui/card": ["./src/app/libs/ui/card/src/index.ts"],
+            "@dots-beacon/ui/carousel": [
+                "./src/app/libs/ui/carousel/src/index.ts"
+            ],
+            "@dots-beacon/ui/checkbox": [
+                "./src/app/libs/ui/checkbox/src/index.ts"
+            ],
+            "@dots-beacon/ui/collapsible": [
+                "./src/app/libs/ui/collapsible/src/index.ts"
+            ],
+            "@dots-beacon/ui/combobox": [
+                "./src/app/libs/ui/combobox/src/index.ts"
+            ],
+            "@dots-beacon/ui/command": [
+                "./src/app/libs/ui/command/src/index.ts"
+            ],
+            "@dots-beacon/ui/context-menu": [
+                "./src/app/libs/ui/context-menu/src/index.ts"
+            ],
+            "@dots-beacon/ui/date-picker": [
+                "./src/app/libs/ui/date-picker/src/index.ts"
+            ],
+            "@dots-beacon/ui/dialog": ["./src/app/libs/ui/dialog/src/index.ts"],
+            "@dots-beacon/ui/drawer": ["./src/app/libs/ui/drawer/src/index.ts"],
+            "@dots-beacon/ui/dropdown-menu": [
+                "./src/app/libs/ui/dropdown-menu/src/index.ts"
+            ],
+            "@dots-beacon/ui/empty": ["./src/app/libs/ui/empty/src/index.ts"],
+            "@dots-beacon/ui/field": ["./src/app/libs/ui/field/src/index.ts"],
+            "@dots-beacon/ui/hover-card": [
+                "./src/app/libs/ui/hover-card/src/index.ts"
+            ],
+            "@dots-beacon/ui/input": ["./src/app/libs/ui/input/src/index.ts"],
+            "@dots-beacon/ui/input-group": [
+                "./src/app/libs/ui/input-group/src/index.ts"
+            ],
+            "@dots-beacon/ui/input-otp": [
+                "./src/app/libs/ui/input-otp/src/index.ts"
+            ],
+            "@dots-beacon/ui/item": ["./src/app/libs/ui/item/src/index.ts"],
+            "@dots-beacon/ui/kbd": ["./src/app/libs/ui/kbd/src/index.ts"],
+            "@dots-beacon/ui/label": ["./src/app/libs/ui/label/src/index.ts"],
+            "@dots-beacon/ui/menubar": [
+                "./src/app/libs/ui/menubar/src/index.ts"
+            ],
+            "@dots-beacon/ui/native-select": [
+                "./src/app/libs/ui/native-select/src/index.ts"
+            ],
+            "@dots-beacon/ui/navigation-menu": [
+                "./src/app/libs/ui/navigation-menu/src/index.ts"
+            ],
+            "@dots-beacon/ui/pagination": [
+                "./src/app/libs/ui/pagination/src/index.ts"
+            ],
+            "@dots-beacon/ui/popover": [
+                "./src/app/libs/ui/popover/src/index.ts"
+            ],
+            "@dots-beacon/ui/progress": [
+                "./src/app/libs/ui/progress/src/index.ts"
+            ],
+            "@dots-beacon/ui/radio-group": [
+                "./src/app/libs/ui/radio-group/src/index.ts"
+            ],
+            "@dots-beacon/ui/resizable": [
+                "./src/app/libs/ui/resizable/src/index.ts"
+            ],
+            "@dots-beacon/ui/scroll-area": [
+                "./src/app/libs/ui/scroll-area/src/index.ts"
+            ],
+            "@dots-beacon/ui/select": ["./src/app/libs/ui/select/src/index.ts"],
+            "@dots-beacon/ui/separator": [
+                "./src/app/libs/ui/separator/src/index.ts"
+            ],
+            "@dots-beacon/ui/sheet": ["./src/app/libs/ui/sheet/src/index.ts"],
+            "@dots-beacon/ui/sidebar": [
+                "./src/app/libs/ui/sidebar/src/index.ts"
+            ],
+            "@dots-beacon/ui/skeleton": [
+                "./src/app/libs/ui/skeleton/src/index.ts"
+            ],
+            "@dots-beacon/ui/slider": ["./src/app/libs/ui/slider/src/index.ts"],
+            "@dots-beacon/ui/sonner": ["./src/app/libs/ui/sonner/src/index.ts"],
+            "@dots-beacon/ui/spinner": [
+                "./src/app/libs/ui/spinner/src/index.ts"
+            ],
+            "@dots-beacon/ui/switch": ["./src/app/libs/ui/switch/src/index.ts"],
+            "@dots-beacon/ui/table": ["./src/app/libs/ui/table/src/index.ts"],
+            "@dots-beacon/ui/tabs": ["./src/app/libs/ui/tabs/src/index.ts"],
+            "@dots-beacon/ui/textarea": [
+                "./src/app/libs/ui/textarea/src/index.ts"
+            ],
+            "@dots-beacon/ui/toggle": ["./src/app/libs/ui/toggle/src/index.ts"],
+            "@dots-beacon/ui/toggle-group": [
+                "./src/app/libs/ui/toggle-group/src/index.ts"
+            ],
+            "@dots-beacon/ui/tooltip": [
+                "./src/app/libs/ui/tooltip/src/index.ts"
+            ],
+            "@dots-beacon/ui/typography": [
+                "./src/app/libs/ui/typography/src/index.ts"
+            ],
+            "@dots-beacon/ui/utils": ["./src/app/libs/ui/utils/src/index.ts"]
+        }
     },
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ]
+    "angularCompilerOptions": {
+        "enableI18nLegacyMessageIdFormat": false,
+        "strictInjectionParameters": true,
+        "strictInputAccessModifiers": true
+    },
+    "files": [],
+    "references": [
+        {
+            "path": "./tsconfig.app.json"
+        },
+        {
+            "path": "./tsconfig.spec.json"
+        }
+    ]
 }

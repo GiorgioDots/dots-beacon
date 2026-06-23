@@ -1,14 +1,14 @@
-import { Directive } from '@angular/core';
-import { BrnComboboxValue } from '@spartan-ng/brain/combobox';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { BrnComboboxValue } from '@spartan-ng/brain/combobox'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: '[hlmComboboxValue],hlm-combobox-value',
-  hostDirectives: [{ directive: BrnComboboxValue, inputs: ['placeholder'] }],
-  host: { 'data-slot': 'combobox-value' },
+    selector: '[hlmComboboxValue],hlm-combobox-value',
+    hostDirectives: [{ directive: BrnComboboxValue, inputs: ['placeholder'] }],
+    host: { 'data-slot': 'combobox-value' },
 })
 export class HlmComboboxValue {
-  constructor() {
-    classes(() => 'data-hidden:hidden');
-  }
+    constructor() {
+        classes(() => 'data-hidden:hidden')
+    }
 }

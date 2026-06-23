@@ -1,15 +1,15 @@
-import { Directive } from '@angular/core';
-import { classes } from '@dots-beacon/ui/utils';
+import { Directive } from '@angular/core'
+import { classes } from '@dots-beacon/ui/utils'
 
 @Directive({
-  selector: 'ul[hlmSidebarMenu]',
-  host: {
-    'data-slot': 'sidebar-menu',
-    'data-sidebar': 'menu',
-  },
+    selector: 'ul[hlmSidebarMenu]',
+    host: {
+        'data-slot': 'sidebar-menu',
+        'data-sidebar': 'menu',
+    },
 })
 export class HlmSidebarMenu {
-  constructor() {
-    classes(() => 'gap-1 flex w-full min-w-0 flex-col');
-  }
+    constructor() {
+        classes(() => 'gap-1 flex w-full min-w-0 flex-col')
+    }
 }
