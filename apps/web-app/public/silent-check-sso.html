@@ -1,0 +1,10 @@
+<!doctype html>
+<html>
+  <body>
+    <script>
+      // Used by keycloak-js `silentCheckSsoRedirectUri` to verify an existing
+      // SSO session inside a hidden iframe without a full-page redirect.
+      parent.postMessage(location.href, location.origin)
+    </script>
+  </body>
+</html>

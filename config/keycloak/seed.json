@@ -18,15 +18,15 @@
   "clients": [
     {
       "clientId": "dots-beacon-app",
-      "name": "dots-beacon application",
+      "name": "dots-beacon SPA (browser)",
+      "description": "Public client for the React single-page app. Uses the authorization-code flow with PKCE; no client secret.",
       "enabled": true,
       "protocol": "openid-connect",
-      "publicClient": false,
-      "secret": "I>ShD>dR)3@)4ZnR--EKgN:oaC,fyR-)rY$VIeJ:HOy",
+      "publicClient": true,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": true,
+      "serviceAccountsEnabled": false,
       "fullScopeAllowed": false,
       "redirectUris": ["http://localhost:5173/*", "http://localhost:8080/*", "http://localhost:4200/*", "http://127.0.0.1:4200/*"],
       "webOrigins": ["+"],
@@ -34,6 +34,20 @@
         "post.logout.redirect.uris": "+",
         "pkce.code.challenge.method": "S256"
       }
+    },
+    {
+      "clientId": "dots-beacon-m2m",
+      "name": "dots-beacon machine-to-machine",
+      "description": "Confidential client for server-to-server / worker-to-server authentication via the client-credentials grant (service account).",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "I>ShD>dR)3@)4ZnR--EKgN:oaC,fyR-)rY$VIeJ:HOy",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "fullScopeAllowed": false
     }
   ],
 
@@ -54,9 +68,9 @@
       ]
     },
     {
-      "username": "service-account-dots-beacon-app",
+      "username": "service-account-dots-beacon-m2m",
       "enabled": true,
-      "serviceAccountClientId": "dots-beacon-app",
+      "serviceAccountClientId": "dots-beacon-m2m",
       "clientRoles": {
         "realm-management": ["manage-users", "view-users", "query-users"]
       }
