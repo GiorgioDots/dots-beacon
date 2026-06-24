@@ -28,7 +28,7 @@
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": true,
       "fullScopeAllowed": false,
-      "redirectUris": ["http://localhost:5173/*", "http://localhost:8080/*", "http://localhost:4200/*"],
+      "redirectUris": ["http://localhost:5173/*", "http://localhost:8080/*", "http://localhost:4200/*", "http://127.0.0.1:4200/*"],
       "webOrigins": ["+"],
       "attributes": {
         "post.logout.redirect.uris": "+",
