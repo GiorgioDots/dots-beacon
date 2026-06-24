@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humagin"
 	"github.com/danielkov/gin-helmet/ginhelmet"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -15,9 +17,17 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// Feature registers its operations against the shared huma API, which derives
+// the OpenAPI spec from the handlers' typed inputs and outputs.
 type Feature interface {
-	RegisterRoutes(r gin.IRouter, authMW gin.HandlerFunc)
+	RegisterRoutes(api huma.API)
 }
+
+// SecurityScheme is the name of the bearer-token security scheme. Operations
+// that opt into authentication reference it in their Security definition, e.g.
+//
+//	Security: []map[string][]string{{server.SecurityScheme: {}}}
+const SecurityScheme = "bearer"
 
 type Server struct {
 	httpServer *http.Server
@@ -32,18 +42,20 @@ func New(cfg config.Config, logger zerolog.Logger, auth *auth.Authenticator, fea
 	ngin.Use(gin.Recovery())
 	ngin.Use(ginhelmet.Default())
 	ngin.Use(corsMiddleware(cfg))
+	// Registered before any routes so it wraps every feature operation; the
+	// huma handlers read the per-request logger off the context.
+	ngin.Use(requestLogger(logger))
 
 	ngin.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
-	authMW := newAuthMiddleware(auth)
+	api := humagin.New(ngin, openAPIConfig())
+	api.UseMiddleware(authMiddleware(api, auth))
 
 	for _, f := range features {
-		f.RegisterRoutes(ngin, authMW)
+		f.RegisterRoutes(api)
 	}
-
-	ngin.Use(requestLogger(logger))
 
 	return &Server{
 		httpServer: &http.Server{
@@ -108,23 +120,48 @@ func requestLogger(logger zerolog.Logger) gin.HandlerFunc {
 	}
 }
 
-func newAuthMiddleware(v *auth.Authenticator) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		raw := strings.TrimPrefix(c.Request.Header.Get("Authorization"), "Bearer ")
+// openAPIConfig describes the API and registers the bearer security scheme so
+// operations can reference it and the docs render an "Authorize" prompt. huma
+// serves the spec at /openapi.json (+ .yaml) and interactive docs at /docs.
+func openAPIConfig() huma.Config {
+	cfg := huma.DefaultConfig("dots-beacon API", "1.0.0")
+	cfg.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
+		SecurityScheme: {
+			Type:         "http",
+			Scheme:       "bearer",
+			BearerFormat: "JWT",
+		},
+	}
+	return cfg
+}
 
-		result, err := v.Verify(c.Request.Context(), raw)
-
-		if err != nil {
-			unauthorized(c, "not authorized")
+// authMiddleware verifies the bearer token for operations that declare the
+// bearer security scheme, then stashes the user id on the request context.
+// Operations without a security requirement pass through untouched.
+func authMiddleware(api huma.API, v *auth.Authenticator) func(huma.Context, func(huma.Context)) {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		if !requiresAuth(ctx.Operation()) {
+			next(ctx)
 			return
 		}
-		SetUserId(c, result.Sub)
 
-		c.Next()
+		raw := strings.TrimPrefix(ctx.Header("Authorization"), "Bearer ")
+		result, err := v.Verify(ctx.Context(), raw)
+		if err != nil {
+			ctx.SetHeader("WWW-Authenticate", `Bearer error="invalid_token"`)
+			_ = huma.WriteErr(api, ctx, http.StatusUnauthorized, "not authorized")
+			return
+		}
+
+		next(huma.WithValue(ctx, userIDKey, result.Sub))
 	}
 }
 
-func unauthorized(c *gin.Context, msg string) {
-	c.Header("WWW-Authenticate", `Bearer error="invalid_token"`)
-	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": msg})
+func requiresAuth(op *huma.Operation) bool {
+	for _, scheme := range op.Security {
+		if _, ok := scheme[SecurityScheme]; ok {
+			return true
+		}
+	}
+	return false
 }

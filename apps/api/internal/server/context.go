@@ -1,15 +1,19 @@
 package server
 
-import "github.com/gin-gonic/gin"
+import "context"
 
-const UserIdKey = "user_id"
+type contextKey string
 
-func GetUserId(c *gin.Context) (string, bool) {
-	v, _ := c.Get(UserIdKey)
-	s, ok := v.(string)
-	return s, ok
+const userIDKey contextKey = "user_id"
+
+// WithUserID returns a copy of ctx carrying the authenticated user id.
+func WithUserID(ctx context.Context, uid string) context.Context {
+	return context.WithValue(ctx, userIDKey, uid)
 }
 
-func SetUserId(c *gin.Context, uid string) {
-	c.Set(UserIdKey, uid)
+// UserIDFrom extracts the authenticated user id placed on the context by the
+// auth middleware. The bool is false when the request was not authenticated.
+func UserIDFrom(ctx context.Context) (string, bool) {
+	s, ok := ctx.Value(userIDKey).(string)
+	return s, ok
 }

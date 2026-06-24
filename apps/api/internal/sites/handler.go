@@ -1,10 +1,11 @@
 package sites
 
 import (
+	"context"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/giorgiodots/dots-beacon/api/internal/respond"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/giorgiodots/dots-beacon/api/internal/server"
 	"github.com/rs/zerolog"
 )
 
@@ -16,38 +17,72 @@ func NewHandler(svc *Service) *Handler {
 	return &Handler{svc: svc}
 }
 
-func (h *Handler) RegisterRoutes(r gin.IRouter, authMW gin.HandlerFunc) {
-	grp := r.Group("/sites")
-	authenticated := grp.Use(authMW)
-	authenticated.GET("/", h.GetSites)
-	authenticated.POST("/", h.CreateSite)
+func (h *Handler) RegisterRoutes(api huma.API) {
+	huma.Register(api, huma.Operation{
+		OperationID: "list-sites",
+		Method:      http.MethodGet,
+		Path:        "/sites",
+		Summary:     "List sites",
+		Description: "Returns all sites belonging to the authenticated user.",
+		Tags:        []string{"sites"},
+		Security:    []map[string][]string{{server.SecurityScheme: {}}},
+	}, h.GetSites)
+
+	huma.Register(api, huma.Operation{
+		OperationID:   "create-site",
+		Method:        http.MethodPost,
+		Path:          "/sites",
+		Summary:       "Create a site",
+		Tags:          []string{"sites"},
+		DefaultStatus: http.StatusCreated,
+		Security:      []map[string][]string{{server.SecurityScheme: {}}},
+	}, h.CreateSite)
 }
 
-func (h *Handler) GetSites(c *gin.Context) {
-	logger := zerolog.Ctx(c.Request.Context())
-	sites, err := h.svc.GetSites(c.Request.Context())
+// ListSitesOutput is the response body for GetSites. huma wraps the Body field
+// as the JSON response and derives its schema from the struct tags.
+type ListSitesOutput struct {
+	Body struct {
+		Sites []Site `json:"sites"`
+	}
+}
+
+func (h *Handler) GetSites(ctx context.Context, _ *struct{}) (*ListSitesOutput, error) {
+	logger := zerolog.Ctx(ctx)
+
+	sites, err := h.svc.GetSites(ctx)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to get sites")
-		respond.Err(c, http.StatusInternalServerError, "internal error")
-		return
+		return nil, huma.Error500InternalServerError("internal error")
 	}
-	c.JSON(http.StatusOK, gin.H{"sites": sites})
+
+	out := &ListSitesOutput{}
+	out.Body.Sites = sites
+	return out, nil
 }
 
-func (h *Handler) CreateSite(c *gin.Context) {
-	logger := zerolog.Ctx(c.Request.Context())
-	var body CreateSiteBody
-	if err := c.ShouldBind(&body); err != nil {
-		logger.Error().Err(err).Msg("create site body not valid")
-		respond.Err(c, http.StatusUnprocessableEntity, "invalid request")
-		return
-	}
+// CreateSiteInput carries the request body for CreateSite; huma validates it
+// against the schema before the handler runs.
+type CreateSiteInput struct {
+	Body CreateSiteBody
+}
 
-	site, err := h.svc.CreateSite(c.Request.Context(), body.Name)
+type CreateSiteOutput struct {
+	Body struct {
+		Site Site `json:"site"`
+	}
+}
+
+func (h *Handler) CreateSite(ctx context.Context, in *CreateSiteInput) (*CreateSiteOutput, error) {
+	logger := zerolog.Ctx(ctx)
+
+	site, err := h.svc.CreateSite(ctx, in.Body.Name)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to create site")
-		respond.Err(c, http.StatusUnprocessableEntity, "invalid error")
+		return nil, huma.Error422UnprocessableEntity("could not create site")
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"craeted": site})
+	out := &CreateSiteOutput{}
+	out.Body.Site = site
+	return out, nil
 }
