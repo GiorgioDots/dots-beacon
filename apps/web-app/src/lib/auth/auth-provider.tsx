@@ -1,33 +1,43 @@
-import {
-  createContext,
-  use,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react'
-import type { KeycloakProfile } from 'keycloak-js'
+import { useEffect, useState, type ReactNode } from 'react'
+import type { KeycloakTokenParsed } from 'keycloak-js'
 
 import { initKeycloak, keycloak } from './keycloak'
+import {
+  AuthContext,
+  type AuthContextValue,
+  type UserProfile,
+} from './auth-context'
 
-export interface AuthContextValue {
-  /** Whether a valid Keycloak session is currently active. */
-  isAuthenticated: boolean
-  /** The authenticated user's profile, once loaded. */
-  user: KeycloakProfile | null
-  /** Current access token (JWT), useful for authorizing API requests. */
-  token: string | undefined
-  /** Redirect to the Keycloak login page. */
-  login: (options?: { redirectUri?: string }) => void
-  /** End the Keycloak session and redirect back to the app. */
-  logout: (options?: { redirectUri?: string }) => void
+// Standard OIDC profile claims that Keycloak includes in the access token.
+type ProfileClaims = KeycloakTokenParsed & {
+  preferred_username?: string
+  email?: string
+  given_name?: string
+  family_name?: string
+  name?: string
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null)
+// Build the user profile straight from the token claims. This avoids a call to
+// the Keycloak Account REST API (`loadUserProfile`), which requires the token
+// to carry the `account` audience + `view-profile` role — neither of which this
+// client issues (it runs with `fullScopeAllowed: false`).
+function readUserProfile(): UserProfile | null {
+  const claims = keycloak.tokenParsed as ProfileClaims | undefined
+  if (!claims) return null
+  return {
+    id: claims.sub,
+    username: claims.preferred_username,
+    email: claims.email,
+    firstName: claims.given_name,
+    lastName: claims.family_name,
+    fullName: claims.name,
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [user, setUser] = useState<KeycloakProfile | null>(null)
+  const [user, setUser] = useState<UserProfile | null>(null)
   const [token, setToken] = useState<string | undefined>(undefined)
 
   useEffect(() => {
@@ -38,7 +48,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       void keycloak.updateToken(30).catch(() => keycloak.logout())
     }
     keycloak.onAuthRefreshSuccess = () => {
-      if (active) setToken(keycloak.token)
+      if (!active) return
+      setToken(keycloak.token)
+      setUser(readUserProfile())
     }
     keycloak.onAuthLogout = () => {
       if (!active) return
@@ -48,14 +60,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     initKeycloak()
-      .then(async (authenticated) => {
+      .then((authenticated) => {
         if (!active) return
         setIsAuthenticated(authenticated)
         setToken(keycloak.token)
-        if (authenticated) {
-          const profile = await keycloak.loadUserProfile().catch(() => null)
-          if (active) setUser(profile)
-        }
+        setUser(authenticated ? readUserProfile() : null)
       })
       .finally(() => {
         if (active) setIsInitialized(true)
@@ -88,14 +97,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return <AuthContext value={value}>{children}</AuthContext>
-}
-
-export function useAuth(): AuthContextValue {
-  const context = use(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an <AuthProvider>')
-  }
-  return context
 }
 
 function AuthLoadingScreen() {

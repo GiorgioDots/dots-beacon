@@ -29,7 +29,7 @@
       "serviceAccountsEnabled": false,
       "fullScopeAllowed": false,
       "redirectUris": ["http://localhost:5173/*", "http://localhost:8080/*", "http://localhost:4200/*", "http://127.0.0.1:4200/*"],
-      "webOrigins": ["+"],
+      "webOrigins": ["+","http://localhost:5173"],
       "attributes": {
         "post.logout.redirect.uris": "+",
         "pkce.code.challenge.method": "S256"
