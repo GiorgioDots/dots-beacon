@@ -12,8 +12,12 @@ type Config struct {
 	AllowedOrigins []string `env:"ALLOWED_ORIGINS" envDefault:"http://localhost:5173"`
 
 	// Auth
-	OidUrl      string `env:"OID_URL"`
-	OidClientId string `env:"OID_CLIENT_ID"`
+	OidUrl string `env:"OID_URL"`
+	// OidAudience is the audience (aud) claim the API requires on incoming
+	// tokens. It identifies this API as a resource server, not a specific
+	// client, so any client (SPA, m2m, workers) whose tokens carry this
+	// audience is accepted.
+	OidAudience string `env:"OID_AUDIENCE"`
 }
 
 // Load reads configuration from environment variables.

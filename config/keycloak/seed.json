@@ -30,6 +30,7 @@
       "fullScopeAllowed": false,
       "redirectUris": ["http://localhost:5173/*", "http://localhost:8080/*", "http://localhost:4200/*", "http://127.0.0.1:4200/*"],
       "webOrigins": ["+","http://localhost:5173"],
+      "defaultClientScopes": ["dots-beacon-api-audience"],
       "attributes": {
         "post.logout.redirect.uris": "+",
         "pkce.code.challenge.method": "S256"
@@ -47,9 +48,38 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": true,
-      "fullScopeAllowed": false
+      "fullScopeAllowed": false,
+      "defaultClientScopes": ["dots-beacon-api-audience"]
     }
   ],
+
+  "clientScopes": [
+    {
+      "name": "dots-beacon-api-audience",
+      "description": "Adds the dots-beacon-api audience to access tokens so the API (resource server) accepts tokens from any client carrying this scope.",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "dots-beacon-api audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.custom.audience": "dots-beacon-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+
+  "defaultDefaultClientScopes": ["dots-beacon-api-audience"],
 
   "users": [
     {

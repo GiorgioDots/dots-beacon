@@ -99,51 +99,81 @@ export const listSites = (
 
 
 
-export const getListSitesMutationOptions = <TError = ErrorType<ErrorModel>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof listSites>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof listSites>>, TError,void, TContext> => {
-
-const mutationKey = ['listSites'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export const getListSitesQueryKey = () => {
+    return [
+    `/sites`
+    ] as const;
+    }
 
 
+export const getListSitesQueryOptions = <TData = Awaited<ReturnType<typeof listSites>>, TError = ErrorType<ErrorModel>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSitesQueryKey();
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof listSites>>, void> = () => {
 
-
-          return  listSites(requestOptions)
-        }
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSites>>> = ({ signal }) => listSites(requestOptions, signal);
 
 
 
 
 
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSites>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
 
-  return  { mutationFn, ...mutationOptions }}
+export type ListSitesQueryResult = NonNullable<Awaited<ReturnType<typeof listSites>>>
+export type ListSitesQueryError = ErrorType<ErrorModel>
 
-    export type ListSitesMutationResult = NonNullable<Awaited<ReturnType<typeof listSites>>>
 
-    export type ListSitesMutationError = ErrorType<ErrorModel>
-
-    /**
+export function useListSites<TData = Awaited<ReturnType<typeof listSites>>, TError = ErrorType<ErrorModel>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSites>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSites>>,
+          TError,
+          Awaited<ReturnType<typeof listSites>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSites<TData = Awaited<ReturnType<typeof listSites>>, TError = ErrorType<ErrorModel>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSites>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSites>>,
+          TError,
+          Awaited<ReturnType<typeof listSites>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSites<TData = Awaited<ReturnType<typeof listSites>>, TError = ErrorType<ErrorModel>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
  * @summary List sites
  */
-export const useListSites = <TError = ErrorType<ErrorModel>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof listSites>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof listSites>>,
-        TError,
-        void,
-        TContext
-      > => {
-      return useMutation(getListSitesMutationOptions(options), queryClient);
-    }
-    /**
+
+export function useListSites<TData = Awaited<ReturnType<typeof listSites>>, TError = ErrorType<ErrorModel>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListSitesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
  * @summary Create a site
  */
 export const createSite = (
@@ -163,77 +193,47 @@ export const createSite = (
 
 
 
-export const getCreateSiteQueryKey = (createSiteBody?: BodyType<NonReadonly<CreateSiteBody>>,) => {
-    return [
-    'POST', `/sites`, createSiteBody
-    ] as const;
-    }
+export const getCreateSiteMutationOptions = <TError = ErrorType<ErrorModel>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSite>>, TError,{data: BodyType<NonReadonly<CreateSiteBody>>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSite>>, TError,{data: BodyType<NonReadonly<CreateSiteBody>>}, TContext> => {
 
-
-export const getCreateSiteQueryOptions = <TData = Awaited<ReturnType<typeof createSite>>, TError = ErrorType<ErrorModel>>(createSiteBody: BodyType<NonReadonly<CreateSiteBody>>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createSite>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getCreateSiteQueryKey(createSiteBody);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof createSite>>> = ({ signal }) => createSite(createSiteBody, requestOptions, signal);
+const mutationKey = ['createSite'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
 
 
 
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSite>>, {data: BodyType<NonReadonly<CreateSiteBody>>}> = (props) => {
+          const {data} = props ?? {};
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof createSite>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CreateSiteQueryResult = NonNullable<Awaited<ReturnType<typeof createSite>>>
-export type CreateSiteQueryError = ErrorType<ErrorModel>
+          return  createSite(data,requestOptions)
+        }
 
 
-export function useCreateSite<TData = Awaited<ReturnType<typeof createSite>>, TError = ErrorType<ErrorModel>>(
- createSiteBody: BodyType<NonReadonly<CreateSiteBody>>, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof createSite>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof createSite>>,
-          TError,
-          Awaited<ReturnType<typeof createSite>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreateSite<TData = Awaited<ReturnType<typeof createSite>>, TError = ErrorType<ErrorModel>>(
- createSiteBody: BodyType<NonReadonly<CreateSiteBody>>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createSite>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof createSite>>,
-          TError,
-          Awaited<ReturnType<typeof createSite>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreateSite<TData = Awaited<ReturnType<typeof createSite>>, TError = ErrorType<ErrorModel>>(
- createSiteBody: BodyType<NonReadonly<CreateSiteBody>>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createSite>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSiteMutationResult = NonNullable<Awaited<ReturnType<typeof createSite>>>
+    export type CreateSiteMutationBody = BodyType<NonReadonly<CreateSiteBody>>
+    export type CreateSiteMutationError = ErrorType<ErrorModel>
+
+    /**
  * @summary Create a site
  */
-
-export function useCreateSite<TData = Awaited<ReturnType<typeof createSite>>, TError = ErrorType<ErrorModel>>(
- createSiteBody: BodyType<NonReadonly<CreateSiteBody>>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createSite>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getCreateSiteQueryOptions(createSiteBody,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
+export const useCreateSite = <TError = ErrorType<ErrorModel>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSite>>, TError,{data: BodyType<NonReadonly<CreateSiteBody>>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createSite>>,
+        TError,
+        {data: BodyType<NonReadonly<CreateSiteBody>>},
+        TContext
+      > => {
+      return useMutation(getCreateSiteMutationOptions(options), queryClient);
+    }

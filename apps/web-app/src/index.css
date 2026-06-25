@@ -98,7 +98,7 @@
     --chart-3: oklch(0.8721 0.0864 68.5474);
     --chart-4: oklch(0.6268 0 0);
     --chart-5: oklch(0.6830 0 0);
-    --radius: 0.75rem;
+    --radius: 0.25rem;
     --sidebar: oklch(0.9670 0.0029 264.5419);
     --sidebar-foreground: oklch(0.2101 0.0318 264.6645);
     --sidebar-primary: oklch(0.6716 0.1368 48.5130);
@@ -118,7 +118,7 @@
     --shadow-offset-x: 0px;
     --shadow-offset-y: 1px;
     --letter-spacing: 0rem;
-    --spacing: 0.25rem;
+    --spacing: 0.20rem;
     --shadow-2xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.03);
     --shadow-xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.03);
     --shadow-sm: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);

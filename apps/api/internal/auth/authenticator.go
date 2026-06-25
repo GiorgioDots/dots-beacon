@@ -22,7 +22,7 @@ func NewAuthVerifier(ctx context.Context, cfg config.Config) (*Authenticator, er
 		return nil, err
 	}
 
-	verifier := provider.Verifier(&oidc.Config{ClientID: cfg.OidClientId})
+	verifier := provider.Verifier(&oidc.Config{ClientID: cfg.OidAudience})
 
 	auth := &Authenticator{
 		provider: provider,
