@@ -17,13 +17,13 @@ tasks:
 
   migrate-up:
     deps:
-      - dev-compose
+      - compose
     cmds:
       - migrate -path package/database/migrations -database {{.DATABASE_URL}} up
 
   migrate-down:
     deps:
-      - dev-compose
+      - compose
     cmds:
       - migrate -path package/database/migrations -database {{.DATABASE_URL}} down
 

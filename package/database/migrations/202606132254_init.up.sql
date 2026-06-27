@@ -30,6 +30,14 @@ CREATE TABLE
         PRIMARY KEY (id)
     );
 
+CREATE TABLE 
+    sites_users_permission_groups (
+        id UUID NOT NULL DEFAULT uuidv7 (),
+        site_user_id UUID NOT NULL REFERENCES sites_users (id),
+        site_permission_group_id UUID NOT NULL REFERENCES sites_permission_groups (id),
+        PRIMARY KEY (id) 
+    );
+
 -- this table will change only if there're new features to be under permission 
 CREATE TABLE 
     permissions (
@@ -40,4 +48,10 @@ CREATE TABLE
     );
 
 INSERT INTO permissions (key, description, is_global) VALUES 
-    ('super_admin.create_site', 'Create new sites', TRUE)
+    ('super_admin.sites.create', 'Create new sites', TRUE),
+    ('super_admin.sites.edit', 'Edit sites', TRUE),
+    ('super_admin.sites.delete', 'Permanently delete a site', TRUE),
+    ('super_admin.users.create', 'Create a user in a site', TRUE),
+    ('super_admin.users.edit_permissions', 'Edit the users permissions in a site', TRUE),
+    ('super_admin.users.remove', 'Remove a user from a site', TRUE)
+

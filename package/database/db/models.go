@@ -33,6 +33,12 @@ type SitesUser struct {
 	SiteID pgtype.UUID
 }
 
+type SitesUsersPermissionGroup struct {
+	ID                    pgtype.UUID
+	SiteUserID            pgtype.UUID
+	SitePermissionGroupID pgtype.UUID
+}
+
 type User struct {
 	ID         pgtype.UUID
 	ExternalID string
